@@ -1,0 +1,9 @@
+{
+    "nuevoApp": {
+        "TipoVehiculo" : {
+            "null": "",
+            "CARRO": "CARRO",
+            "MOTO": "MOTO"
+        }
+    }
+}
