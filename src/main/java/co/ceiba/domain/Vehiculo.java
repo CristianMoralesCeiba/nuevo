@@ -6,7 +6,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Objects;
 
 import co.ceiba.domain.enumeration.TipoVehiculo;
@@ -39,7 +39,7 @@ public class Vehiculo implements Serializable {
 
     @NotNull
     @Column(name = "fecha_ingreso", nullable = false)
-    private LocalDate fechaIngreso;
+    private Instant fechaIngreso;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -89,16 +89,16 @@ public class Vehiculo implements Serializable {
         this.cilindraje = cilindraje;
     }
 
-    public LocalDate getFechaIngreso() {
+    public Instant getFechaIngreso() {
         return fechaIngreso;
     }
 
-    public Vehiculo fechaIngreso(LocalDate fechaIngreso) {
+    public Vehiculo fechaIngreso(Instant fechaIngreso) {
         this.fechaIngreso = fechaIngreso;
         return this;
     }
 
-    public void setFechaIngreso(LocalDate fechaIngreso) {
+    public void setFechaIngreso(Instant fechaIngreso) {
         this.fechaIngreso = fechaIngreso;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove

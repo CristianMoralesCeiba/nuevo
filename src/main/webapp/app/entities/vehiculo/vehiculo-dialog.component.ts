@@ -18,7 +18,6 @@ export class VehiculoDialogComponent implements OnInit {
 
     vehiculo: Vehiculo;
     isSaving: boolean;
-    fechaIngresoDp: any;
 
     constructor(
         public activeModal: NgbActiveModal,

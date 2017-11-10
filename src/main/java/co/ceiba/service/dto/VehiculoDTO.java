@@ -1,7 +1,7 @@
 package co.ceiba.service.dto;
 
 
-import java.time.LocalDate;
+import java.time.Instant;
 import javax.validation.constraints.*;
 import java.io.Serializable;
 import java.util.Objects;
@@ -23,7 +23,7 @@ public class VehiculoDTO implements Serializable {
     private Integer cilindraje;
 
     @NotNull
-    private LocalDate fechaIngreso;
+    private Instant fechaIngreso;
 
     public Long getId() {
         return id;
@@ -57,11 +57,11 @@ public class VehiculoDTO implements Serializable {
         this.cilindraje = cilindraje;
     }
 
-    public LocalDate getFechaIngreso() {
+    public Instant getFechaIngreso() {
         return fechaIngreso;
     }
 
-    public void setFechaIngreso(LocalDate fechaIngreso) {
+    public void setFechaIngreso(Instant fechaIngreso) {
         this.fechaIngreso = fechaIngreso;
     }
 

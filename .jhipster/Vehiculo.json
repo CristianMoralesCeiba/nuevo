@@ -23,7 +23,7 @@
         },
         {
             "fieldName": "fechaIngreso",
-            "fieldType": "LocalDate",
+            "fieldType": "Instant",
             "fieldValidateRules": [
                 "required"
             ]

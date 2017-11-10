@@ -63,7 +63,7 @@ export class VehiculoService {
     private convertItemFromServer(json: any): Vehiculo {
         const entity: Vehiculo = Object.assign(new Vehiculo(), json);
         entity.fechaIngreso = this.dateUtils
-            .convertLocalDateFromServer(json.fechaIngreso);
+            .convertDateTimeFromServer(json.fechaIngreso);
         return entity;
     }
 
@@ -72,8 +72,8 @@ export class VehiculoService {
      */
     private convert(vehiculo: Vehiculo): Vehiculo {
         const copy: Vehiculo = Object.assign({}, vehiculo);
-        copy.fechaIngreso = this.dateUtils
-            .convertLocalDateToServer(vehiculo.fechaIngreso);
+
+        copy.fechaIngreso = this.dateUtils.toDate(vehiculo.fechaIngreso);
         return copy;
     }
 }

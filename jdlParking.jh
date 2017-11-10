@@ -3,7 +3,7 @@ entity Vehiculo {
 	placa String required,
     tipo TipoVehiculo required,
     cilindraje Integer,
-	fechaIngreso LocalDate required
+	fechaIngreso Instant required
 }
 
 enum TipoVehiculo {

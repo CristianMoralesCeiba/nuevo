@@ -1,6 +1,7 @@
 import { Injectable, Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { DatePipe } from '@angular/common';
 import { Vehiculo } from './vehiculo.model';
 import { VehiculoService } from './vehiculo.service';
 
@@ -9,6 +10,7 @@ export class VehiculoPopupService {
     private ngbModalRef: NgbModalRef;
 
     constructor(
+        private datePipe: DatePipe,
         private modalService: NgbModal,
         private router: Router,
         private vehiculoService: VehiculoService
@@ -26,13 +28,8 @@ export class VehiculoPopupService {
 
             if (id) {
                 this.vehiculoService.find(id).subscribe((vehiculo) => {
-                    if (vehiculo.fechaIngreso) {
-                        vehiculo.fechaIngreso = {
-                            year: vehiculo.fechaIngreso.getFullYear(),
-                            month: vehiculo.fechaIngreso.getMonth() + 1,
-                            day: vehiculo.fechaIngreso.getDate()
-                        };
-                    }
+                    vehiculo.fechaIngreso = this.datePipe
+                        .transform(vehiculo.fechaIngreso, 'yyyy-MM-ddTHH:mm:ss');
                     this.ngbModalRef = this.vehiculoModalRef(component, vehiculo);
                     resolve(this.ngbModalRef);
                 });
