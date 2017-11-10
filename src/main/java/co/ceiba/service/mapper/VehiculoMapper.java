@@ -11,10 +11,6 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", uses = {})
 public interface VehiculoMapper extends EntityMapper<VehiculoDTO, Vehiculo> {
 
-    
-
-    
-
     default Vehiculo fromId(Long id) {
         if (id == null) {
             return null;

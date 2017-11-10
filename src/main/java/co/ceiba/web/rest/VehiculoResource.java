@@ -2,10 +2,11 @@ package co.ceiba.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 import co.ceiba.domain.Vehiculo;
-
+import co.ceiba.domain.enumeration.TipoVehiculo;
 import co.ceiba.repository.VehiculoRepository;
 import co.ceiba.web.rest.errors.BadRequestAlertException;
 import co.ceiba.web.rest.util.HeaderUtil;
+import co.ceiba.service.VehiculoService;
 import co.ceiba.service.dto.VehiculoDTO;
 import co.ceiba.service.mapper.VehiculoMapper;
 import io.github.jhipster.web.util.ResponseUtil;
@@ -35,10 +36,13 @@ public class VehiculoResource {
     private final VehiculoRepository vehiculoRepository;
 
     private final VehiculoMapper vehiculoMapper;
+    
+    private final VehiculoService vehiculoService;
 
-    public VehiculoResource(VehiculoRepository vehiculoRepository, VehiculoMapper vehiculoMapper) {
+    public VehiculoResource(VehiculoRepository vehiculoRepository, VehiculoMapper vehiculoMapper, VehiculoService vehiculoService) {
         this.vehiculoRepository = vehiculoRepository;
         this.vehiculoMapper = vehiculoMapper;
+        this.vehiculoService = vehiculoService;
     }
 
     /**
@@ -52,12 +56,31 @@ public class VehiculoResource {
     @Timed
     public ResponseEntity<VehiculoDTO> createVehiculo(@Valid @RequestBody VehiculoDTO vehiculoDTO) throws URISyntaxException {
         log.debug("REST request to save Vehiculo : {}", vehiculoDTO);
-        if (vehiculoDTO.getId() != null) {
+
+		if (vehiculoDTO.getId() != null) {
             throw new BadRequestAlertException("A new vehiculo cannot already have an ID", ENTITY_NAME, "idexists");
         }
+		
         Vehiculo vehiculo = vehiculoMapper.toEntity(vehiculoDTO);
+        
+        if (!vehiculoRepository.findByPlacaAndTipo(vehiculoDTO.getPlaca(), vehiculoDTO.getTipo()).isEmpty()) {
+        	throw new BadRequestAlertException("El vehiculo ya se encuentra en el parqueadero", ENTITY_NAME, "placaexist");
+        }
+        
+        if (vehiculoDTO.getTipo().equals(TipoVehiculo.MOTO)){
+        	if (vehiculoService.hayCupo(TipoVehiculo.MOTO)) {
+            	throw new BadRequestAlertException("Ya no hay cupo para motos", ENTITY_NAME, "motomax");
+            }
+        } else if (vehiculoDTO.getTipo().equals(TipoVehiculo.CARRO)){
+        	if (vehiculoService.hayCupo(TipoVehiculo.CARRO)) {
+            	throw new BadRequestAlertException("Ya no hay cupo para carros", ENTITY_NAME, "carromax");
+            }
+        }
+        
         vehiculo = vehiculoRepository.save(vehiculo);
-        VehiculoDTO result = vehiculoMapper.toDto(vehiculo);
+        
+        VehiculoDTO result =vehiculoMapper.toDto(vehiculo);
+        
         return ResponseEntity.created(new URI("/api/vehiculos/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
             .body(result);

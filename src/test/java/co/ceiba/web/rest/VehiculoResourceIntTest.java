@@ -4,6 +4,7 @@ import co.ceiba.NuevoApp;
 
 import co.ceiba.domain.Vehiculo;
 import co.ceiba.repository.VehiculoRepository;
+import co.ceiba.service.VehiculoService;
 import co.ceiba.service.dto.VehiculoDTO;
 import co.ceiba.service.mapper.VehiculoMapper;
 import co.ceiba.web.rest.errors.ExceptionTranslator;
@@ -23,6 +24,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
@@ -52,14 +55,17 @@ public class VehiculoResourceIntTest {
     private static final Integer DEFAULT_CILINDRAJE = 1;
     private static final Integer UPDATED_CILINDRAJE = 2;
 
-    private static final LocalDate DEFAULT_FECHA_INGRESO = LocalDate.ofEpochDay(0L);
-    private static final LocalDate UPDATED_FECHA_INGRESO = LocalDate.now(ZoneId.systemDefault());
+    private static final Instant DEFAULT_FECHA_INGRESO = Instant.parse("2017-11-08T10:12:35Z");
+    private static final Instant UPDATED_FECHA_INGRESO = Instant.parse("2017-11-08T10:12:35Z");
 
     @Autowired
     private VehiculoRepository vehiculoRepository;
 
     @Autowired
     private VehiculoMapper vehiculoMapper;
+
+    @Autowired
+    private VehiculoService vehiculoService;
 
     @Autowired
     private MappingJackson2HttpMessageConverter jacksonMessageConverter;
@@ -80,7 +86,7 @@ public class VehiculoResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final VehiculoResource vehiculoResource = new VehiculoResource(vehiculoRepository, vehiculoMapper);
+        final VehiculoResource vehiculoResource = new VehiculoResource(vehiculoRepository, vehiculoMapper, vehiculoService);
         this.restVehiculoMockMvc = MockMvcBuilders.standaloneSetup(vehiculoResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
