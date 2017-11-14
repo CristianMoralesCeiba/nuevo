@@ -1,7 +1,6 @@
 package co.ceiba.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
-import com.sun.jersey.spi.inject.Errors.ErrorMessagesException;
 
 import co.ceiba.domain.Vehiculo;
 import co.ceiba.domain.enumeration.TipoVehiculo;
