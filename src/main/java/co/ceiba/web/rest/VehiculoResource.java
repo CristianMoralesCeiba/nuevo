@@ -1,10 +1,13 @@
 package co.ceiba.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
+import com.sun.jersey.spi.inject.Errors.ErrorMessagesException;
+
 import co.ceiba.domain.Vehiculo;
 import co.ceiba.domain.enumeration.TipoVehiculo;
 import co.ceiba.repository.VehiculoRepository;
 import co.ceiba.web.rest.errors.BadRequestAlertException;
+import co.ceiba.web.rest.util.ErrorMessages;
 import co.ceiba.web.rest.util.HeaderUtil;
 import co.ceiba.service.VehiculoService;
 import co.ceiba.service.dto.VehiculoDTO;
@@ -55,7 +58,6 @@ public class VehiculoResource {
     @PostMapping("/vehiculos")
     @Timed
     public ResponseEntity<VehiculoDTO> createVehiculo(@Valid @RequestBody VehiculoDTO vehiculoDTO) throws URISyntaxException {
-        log.debug("REST request to save Vehiculo : {}", vehiculoDTO);
 
 		if (vehiculoDTO.getId() != null) {
             throw new BadRequestAlertException("A new vehiculo cannot already have an ID", ENTITY_NAME, "idexists");
@@ -69,7 +71,7 @@ public class VehiculoResource {
         
         if (vehiculoDTO.getTipo().equals(TipoVehiculo.MOTO)){
         	if (vehiculoService.hayCupo(TipoVehiculo.MOTO)) {
-            	throw new BadRequestAlertException("Ya no hay cupo para motos", ENTITY_NAME, "motomax");
+            	throw new BadRequestAlertException(ErrorMessages.VEHICULOS_TOPE_MOTOS, ENTITY_NAME, "motomax");
             }
         } else if (vehiculoDTO.getTipo().equals(TipoVehiculo.CARRO)){
         	if (vehiculoService.hayCupo(TipoVehiculo.CARRO)) {
@@ -78,8 +80,7 @@ public class VehiculoResource {
         }
         
         vehiculo = vehiculoRepository.save(vehiculo);
-        
-        VehiculoDTO result =vehiculoMapper.toDto(vehiculo);
+        VehiculoDTO result = vehiculoMapper.toDto(vehiculo);
         
         return ResponseEntity.created(new URI("/api/vehiculos/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))

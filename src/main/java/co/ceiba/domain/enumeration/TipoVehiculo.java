@@ -4,7 +4,7 @@ package co.ceiba.domain.enumeration;
  * The TipoVehiculo enumeration.
  */
 public enum TipoVehiculo {
-    CARRO, MOTO; 
+    CARRO, MOTO;
 
 	private static final int CUPO_MOTOS = 10;
 	private static final int CUPO_CARROS = 20;

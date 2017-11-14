@@ -25,11 +25,12 @@ public class VehiculoDTO implements Serializable {
     @NotNull
     private Instant fechaIngreso;
 
+    
     public VehiculoDTO(){
     	super();
     }
     
-    public VehiculoDTO(Long id, String placa, TipoVehiculo tipo, Integer cilindraje, Instant fechaIngreso) {
+	public VehiculoDTO(Long id, String placa, TipoVehiculo tipo, Integer cilindraje, Instant fechaIngreso) {
 		super();
 		this.id = id;
 		this.placa = placa;
