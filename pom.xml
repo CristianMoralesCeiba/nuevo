@@ -549,6 +549,11 @@
                     <logging>debug</logging>
                 </configuration>
                 <dependencies>
+	                <dependency>
+					    <groupId>com.sun.jersey</groupId>
+					    <artifactId>jersey-bundle</artifactId>
+					    <version>1.10-b01</version>
+					</dependency>
                     <dependency>
                         <groupId>org.javassist</groupId>
                         <artifactId>javassist</artifactId>
@@ -721,6 +726,7 @@
                     <artifactId>spring-boot-devtools</artifactId>
                     <optional>true</optional>
                 </dependency>
+                
             </dependencies>
             <build>
                 <plugins>
