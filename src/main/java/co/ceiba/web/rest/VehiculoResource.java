@@ -58,7 +58,7 @@ public class VehiculoResource {
         log.debug("REST request to save Vehiculo : {}", vehiculoDTO);
 
 		if (vehiculoDTO.getId() != null) {
-            throw new BadRequestAlertException("A new vehiculo cannot already have an ID", ENTITY_NAME, "placaexist");
+            throw new BadRequestAlertException(ErrorMessages.NO_ID_NEW_VEHICULO, ENTITY_NAME, "idexists");
         } else {
 	        Vehiculo vehiculo = vehiculoMapper.toEntity(vehiculoDTO);
 	        
