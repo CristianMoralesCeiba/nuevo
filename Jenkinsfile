@@ -22,6 +22,14 @@ node {
         sh "./mvnw com.github.eirslett:frontend-maven-plugin:yarn"
     }
 
+	stage('build') {
+        try {
+            sh "./mvnw install"
+        } catch(err) {
+            throw err
+        } 
+    }
+	
     stage('backend tests') {
         try {
             sh "./mvnw test"
