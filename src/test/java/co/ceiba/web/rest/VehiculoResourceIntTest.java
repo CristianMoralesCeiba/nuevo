@@ -9,7 +9,6 @@ import co.ceiba.service.dto.VehiculoDTO;
 import co.ceiba.service.mapper.VehiculoMapper;
 import co.ceiba.web.rest.errors.ExceptionTranslator;
 import co.ceiba.web.rest.testDataBuilder.VehiculoTestDataBuilder;
-import co.ceiba.web.rest.util.ErrorMessages;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +21,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +32,6 @@ import java.util.List;
 import static co.ceiba.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.junit.Assert.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -112,21 +109,22 @@ public class VehiculoResourceIntTest {
 
     @Test
     @Transactional
-    public void createVehiculoWithExistingId() throws Exception {        
+    public void createVehiculoWithExistingId() throws Exception {
+    	//arrage
         VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
-        VehiculoDTO vehiculo = vehiculoTestDataBuilder.build();
-        
-        MvcResult result = restVehiculoMockMvc.perform(post("/api/vehiculos")
+    	
+        int databaseSizeBeforeCreate = vehiculoRepository.findAll().size();
+        // Create the Vehiculo
+        VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.conID(1L).build();
+        // An entity with an existing ID cannot be created, so this API call must fail
+        restVehiculoMockMvc.perform(post("/api/vehiculos")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(vehiculo)))
-            .andExpect(status().isBadRequest()).andReturn();
+            .content(TestUtil.convertObjectToJsonBytes(vehiculoDTO)))
+            .andExpect(status().isBadRequest());
 
-        /* Validate the User in the database
+        // Validate the Vehiculo in the database
         List<Vehiculo> vehiculoList = vehiculoRepository.findAll();
-        assertThat(vehiculoList).hasSize(databaseSizeBeforeCreate + 1);
-        Vehiculo testVehiculo = vehiculoList.get(vehiculoList.size() - 1);
-        assertThat(testVehiculo.getPlaca()).isEqualTo(vehiculo.getPlaca());*/
-        assertEquals(result.getResolvedException().getMessage(), ErrorMessages.VEHICULOS_TOPE_MOTOS);
+        assertThat(vehiculoList).hasSize(databaseSizeBeforeCreate);
     }
 /*
     @Test
