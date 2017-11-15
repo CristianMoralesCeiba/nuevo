@@ -1,4 +1,3 @@
-#!/usr/bin/sh
 #!/usr/bin/env groovy
 
 node {
