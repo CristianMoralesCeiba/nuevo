@@ -64,12 +64,12 @@ public class VehiculoResource {
 	        
 	        if (!vehiculoRepository.findByPlacaAndTipo(vehiculoDTO.getPlaca(), vehiculoDTO.getTipo()).isEmpty()) {
 	        	throw new BadRequestAlertException("El vehiculo ya se encuentra en el parqueadero", ENTITY_NAME, "placaexist");
-	        } else if (!vehiculoDTO.getTipo().equals(TipoVehiculo.MOTO)){
-	        	if (vehiculoService.hayCupo(TipoVehiculo.MOTO)) {
+	        } else if (vehiculoDTO.getTipo().equals(TipoVehiculo.MOTO)){
+	        	if (!vehiculoService.hayCupo(TipoVehiculo.MOTO)) {
 	            	throw new BadRequestAlertException(ErrorMessages.VEHICULOS_TOPE_MOTOS, ENTITY_NAME, "motomax");
 	            }
-	        } else if (!vehiculoDTO.getTipo().equals(TipoVehiculo.CARRO)){
-	        	if (vehiculoService.hayCupo(TipoVehiculo.CARRO)) {
+	        } else if (vehiculoDTO.getTipo().equals(TipoVehiculo.CARRO)){
+	        	if (!vehiculoService.hayCupo(TipoVehiculo.CARRO)) {
 	            	throw new BadRequestAlertException("Ya no hay cupo para carros", ENTITY_NAME, "carromax");
 	            }
 	        }
