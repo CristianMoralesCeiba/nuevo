@@ -59,30 +59,28 @@ public class VehiculoResource {
 
 		if (vehiculoDTO.getId() != null) {
             throw new BadRequestAlertException("A new vehiculo cannot already have an ID", ENTITY_NAME, "idexists");
+        } else {
+	        Vehiculo vehiculo = vehiculoMapper.toEntity(vehiculoDTO);
+	        
+	        if (!vehiculoRepository.findByPlacaAndTipo(vehiculoDTO.getPlaca(), vehiculoDTO.getTipo()).isEmpty()) {
+	        	throw new BadRequestAlertException("El vehiculo ya se encuentra en el parqueadero", ENTITY_NAME, "placaexist");
+	        } else if (vehiculoDTO.getTipo().equals(TipoVehiculo.MOTO)){
+	        	if (vehiculoService.hayCupo(TipoVehiculo.MOTO)) {
+	            	throw new BadRequestAlertException(ErrorMessages.VEHICULOS_TOPE_MOTOS, ENTITY_NAME, "motomax");
+	            }
+	        } else if (vehiculoDTO.getTipo().equals(TipoVehiculo.CARRO)){
+	        	if (vehiculoService.hayCupo(TipoVehiculo.CARRO)) {
+	            	throw new BadRequestAlertException("Ya no hay cupo para carros", ENTITY_NAME, "carromax");
+	            }
+	        }
+	        
+	        vehiculo = vehiculoRepository.save(vehiculo);
+	        VehiculoDTO result = vehiculoMapper.toDto(vehiculo);
+	        
+	        return ResponseEntity.created(new URI("/api/vehiculos/" + result.getId()))
+	            .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
+	            .body(result);
         }
-		
-        Vehiculo vehiculo = vehiculoMapper.toEntity(vehiculoDTO);
-        
-        if (!vehiculoRepository.findByPlacaAndTipo(vehiculoDTO.getPlaca(), vehiculoDTO.getTipo()).isEmpty()) {
-        	throw new BadRequestAlertException("El vehiculo ya se encuentra en el parqueadero", ENTITY_NAME, "placaexist");
-        }
-        
-        if (vehiculoDTO.getTipo().equals(TipoVehiculo.MOTO)){
-        	if (vehiculoService.hayCupo(TipoVehiculo.MOTO)) {
-            	throw new BadRequestAlertException(ErrorMessages.VEHICULOS_TOPE_MOTOS, ENTITY_NAME, "motomax");
-            }
-        } else if (vehiculoDTO.getTipo().equals(TipoVehiculo.CARRO)){
-        	if (vehiculoService.hayCupo(TipoVehiculo.CARRO)) {
-            	throw new BadRequestAlertException("Ya no hay cupo para carros", ENTITY_NAME, "carromax");
-            }
-        }
-        
-        vehiculo = vehiculoRepository.save(vehiculo);
-        VehiculoDTO result = vehiculoMapper.toDto(vehiculo);
-        
-        return ResponseEntity.created(new URI("/api/vehiculos/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
-            .body(result);
     }
 
     /**
