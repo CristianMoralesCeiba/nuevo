@@ -4,6 +4,7 @@ import co.ceiba.NuevoApp;
 
 import co.ceiba.domain.Vehiculo;
 import co.ceiba.repository.VehiculoRepository;
+import co.ceiba.service.VehiculoService;
 import co.ceiba.service.dto.VehiculoDTO;
 import co.ceiba.service.mapper.VehiculoMapper;
 import co.ceiba.web.rest.errors.ExceptionTranslator;
@@ -71,6 +72,9 @@ public class VehiculoResourceIntTest {
     private ExceptionTranslator exceptionTranslator;
 
     @Autowired
+    private VehiculoService vehiculoService;
+    
+    @Autowired
     private EntityManager em;
 
     private MockMvc restVehiculoMockMvc;
@@ -80,7 +84,7 @@ public class VehiculoResourceIntTest {
     @Before
     public void setup() {
         MockitoAnnotations.initMocks(this);
-        final VehiculoResource vehiculoResource = new VehiculoResource(vehiculoRepository, vehiculoMapper);
+        final VehiculoResource vehiculoResource = new VehiculoResource(vehiculoRepository, vehiculoMapper, vehiculoService);
         this.restVehiculoMockMvc = MockMvcBuilders.standaloneSetup(vehiculoResource)
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
