@@ -12,7 +12,20 @@ import co.ceiba.domain.enumeration.TipoVehiculo;
  */
 public class VehiculoDTO implements Serializable {
 
-    private Long id;
+	public VehiculoDTO() {
+		super();
+	}
+	
+    public VehiculoDTO(Long id, String placa, TipoVehiculo tipo, Integer cilindraje, Instant fechaIngreso) {
+		super();
+		this.id = id;
+		this.placa = placa;
+		this.tipo = tipo;
+		this.cilindraje = cilindraje;
+		this.fechaIngreso = fechaIngreso;
+	}
+
+	private Long id;
 
     @NotNull
     private String placa;

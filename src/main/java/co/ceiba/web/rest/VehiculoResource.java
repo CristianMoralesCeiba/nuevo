@@ -86,30 +86,6 @@ public class VehiculoResource {
     }
 
     /**
-     * PUT  /vehiculos : Updates an existing vehiculo.
-     *
-     * @param vehiculoDTO the vehiculoDTO to update
-     * @return the ResponseEntity with status 200 (OK) and with body the updated vehiculoDTO,
-     * or with status 400 (Bad Request) if the vehiculoDTO is not valid,
-     * or with status 500 (Internal Server Error) if the vehiculoDTO couldn't be updated
-     * @throws URISyntaxException if the Location URI syntax is incorrect
-     */
-    @PutMapping("/vehiculos")
-    @Timed
-    public ResponseEntity<VehiculoDTO> updateVehiculo(@Valid @RequestBody VehiculoDTO vehiculoDTO) throws URISyntaxException {
-        log.debug("REST request to update Vehiculo : {}", vehiculoDTO);
-        if (vehiculoDTO.getId() == null) {
-            return createVehiculo(vehiculoDTO);
-        }
-        Vehiculo vehiculo = vehiculoMapper.toEntity(vehiculoDTO);
-        vehiculo = vehiculoRepository.save(vehiculo);
-        VehiculoDTO result = vehiculoMapper.toDto(vehiculo);
-        return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(ENTITY_NAME, vehiculoDTO.getId().toString()))
-            .body(result);
-    }
-
-    /**
      * GET  /vehiculos : get all the vehiculos.
      *
      * @return the ResponseEntity with status 200 (OK) and the list of vehiculos in body
