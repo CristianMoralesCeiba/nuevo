@@ -57,7 +57,10 @@ node {
 
     stage('quality analysis') {
         withSonarQubeEnv('Sonar') {
-            sh "./mvnw sonar:sonar"
+            sh "./mvnw sonar:sonar \
+				-Dsonar.host.url=https://sonarcloud.io \
+				-Dsonar.organization=cristianmoralesceiba-github \
+				-Dsonar.login=293000f651ed0f95823ff7a9d5e177bf9e91d63c"
         }
     }
 }
