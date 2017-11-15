@@ -145,6 +145,9 @@ public class VehiculoResourceIntTest {
                     .andExpect(status().isCreated());
         }
         
+        vehiculoDTO = vehiculoTestDataBuilder.conPlaca("10" + vehiculoTestDataBuilder.PLACA).build();
+        
+        
         // An entity with an existing ID cannot be created, so this API call must fail
         MvcResult result = restVehiculoMockMvc.perform(post("/api/vehiculos")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
