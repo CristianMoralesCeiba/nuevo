@@ -24,7 +24,7 @@ node {
 
 	stage('build') {
         try {
-            sh "./mvnw install -DskipTests"
+            sh "./mvnw install"
         } catch(err) {
             throw err
         } 
@@ -57,7 +57,7 @@ node {
 
     stage('quality analysis') {
         withSonarQubeEnv('Sonar') {
-            sh "./mvnw sonar:sonar -Dsonar.organization=cristianmoralesceiba-github"
+            sh "./mvnw sonar:sonar"
         }
     }
 }
