@@ -126,6 +126,23 @@ public class VehiculoResourceIntTest {
 
         assertEquals(result.getResolvedException().getMessage(), ErrorMessages.NO_ID_NEW_VEHICULO);	
     }
+    
+    @Test
+    @Transactional
+    public void crearVehiculoSinCupoMoto() throws Exception {
+    	//arrage
+        VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
+        
+        // Create the Vehiculo
+        VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.conID(1L).build();
+        // An entity with an existing ID cannot be created, so this API call must fail
+        MvcResult result = restVehiculoMockMvc.perform(post("/api/vehiculos")
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .content(TestUtil.convertObjectToJsonBytes(vehiculoDTO)))
+            .andExpect(status().isBadRequest()).andReturn();
+
+        assertEquals(result.getResolvedException().getMessage(), ErrorMessages.VEHICULOS_TOPE_MOTOS);	
+    }
 /*
     @Test
     @Transactional
