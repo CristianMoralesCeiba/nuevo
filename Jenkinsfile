@@ -24,7 +24,7 @@ node {
 
 	stage('build') {
         try {
-            sh "./mvnw install"
+            sh "./mvnw install -DskipTests"
         } catch(err) {
             throw err
         } 
