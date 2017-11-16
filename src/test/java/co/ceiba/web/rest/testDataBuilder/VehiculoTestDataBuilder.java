@@ -6,11 +6,11 @@ import co.ceiba.service.dto.VehiculoDTO;
 
 public class VehiculoTestDataBuilder {
 
-	public static final Long ID = null;
-	public static final String PLACA = "BCD123";
-	public static final TipoVehiculo TIPO = TipoVehiculo.MOTO;
-	public static final Integer CILINDRAJE = 100;
-	public static final Instant FECHAINGRESO = Instant.parse("2017-11-08T10:12:35Z");
+	public final Long ID = null;
+	public final String PLACA = "BCD123";
+	public final TipoVehiculo TIPO = TipoVehiculo.MOTO;
+	public final Integer CILINDRAJE = 100;
+	public final Instant FECHAINGRESO = Instant.parse("2017-11-08T10:12:35Z");
 	
     private Long id;
     private String placa;

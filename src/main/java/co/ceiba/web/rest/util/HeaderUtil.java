@@ -1,5 +1,7 @@
 package co.ceiba.web.rest.util;
 
+import java.math.BigDecimal;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -28,10 +30,14 @@ public final class HeaderUtil {
         return createAlert("A " + entityName + " is updated with identifier " + param, param);
     }
 
-    public static HttpHeaders createEntityDeletionAlert(String entityName, String param) {
-        return createAlert("A " + entityName + " is deleted with identifier " + param, param);
+    public static HttpHeaders createEntityDeletionAlert(String entityName, String id) {
+        return createAlert("A " + entityName + " is deleted with identifier " + id, id);
     }
-
+    
+    public static HttpHeaders createEntityValueDeletionAlert(BigDecimal valor) {
+        return createAlert(valor.toString(), "valor");
+    }
+    
     public static HttpHeaders createFailureAlert(String entityName, String errorKey, String defaultMessage) {
         log.error("Entity processing failed, {}", defaultMessage);
         HttpHeaders headers = new HttpHeaders();

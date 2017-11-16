@@ -27,6 +27,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+
+import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -124,7 +127,7 @@ public class VehiculoResourceIntTest {
             .content(TestUtil.convertObjectToJsonBytes(vehiculoDTO)))
             .andExpect(status().isBadRequest()).andReturn();
 
-        assertEquals(result.getResolvedException().getMessage(), ErrorMessages.NO_ID_NEW_VEHICULO);	
+        assertEquals(result.getResolvedException().getMessage(), ErrorMessages.VEHICULO_NO_ID_NEW);	
     }
     
     @Test
@@ -132,29 +135,170 @@ public class VehiculoResourceIntTest {
     public void crearVehiculoSinCupoMoto() throws Exception {
     	//arrage
         VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
-        
-        // Create the Vehiculo
         VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.build();
         
-        for (int i = 0; i < 9; i++){
+        //act
+        for (int i = 0; i < vehiculoDTO.getTipo().getCupo(); i++){
             vehiculoDTO = vehiculoTestDataBuilder.conPlaca(i + vehiculoTestDataBuilder.PLACA).build();
             
-        	restVehiculoMockMvc.perform(post("/api/vehiculos")
-                    .contentType(TestUtil.APPLICATION_JSON_UTF8)
-                    .content(TestUtil.convertObjectToJsonBytes(vehiculoDTO)))
-                    .andExpect(status().isCreated());
+        	vehiculoRepository.saveAndFlush(vehiculoMapper.toEntity(vehiculoDTO));
         }
         
+        //equals
         vehiculoDTO = vehiculoTestDataBuilder.conPlaca("10" + vehiculoTestDataBuilder.PLACA).build();
         
-        
-        // An entity with an existing ID cannot be created, so this API call must fail
         MvcResult result = restVehiculoMockMvc.perform(post("/api/vehiculos")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(vehiculoDTO)))
             .andExpect(status().isBadRequest()).andReturn();
 
-        assertEquals(result.getResolvedException().getMessage(), ErrorMessages.VEHICULOS_TOPE_MOTOS);	
+        assertEquals(result.getResolvedException().getMessage(), ErrorMessages.VEHICULO_TOPE_MOTOS);	
+    }
+    
+    @Test
+    @Transactional
+    public void crearVehiculoSinCupoCarro() throws Exception {
+    	//arrage
+        VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
+        VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.conTipo(TipoVehiculo.CARRO).build();
+        
+        //act
+        for (int i = 0; i < vehiculoDTO.getTipo().getCupo(); i++){
+            vehiculoDTO = vehiculoTestDataBuilder.conTipo(TipoVehiculo.CARRO)
+            			.conPlaca(i + vehiculoTestDataBuilder.PLACA).build();
+            
+        	vehiculoRepository.saveAndFlush(vehiculoMapper.toEntity(vehiculoDTO));
+        }
+        
+      	//equals
+        vehiculoDTO = vehiculoTestDataBuilder.conPlaca("10" + vehiculoTestDataBuilder.PLACA).build();
+        
+        MvcResult result = restVehiculoMockMvc.perform(post("/api/vehiculos")
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .content(TestUtil.convertObjectToJsonBytes(vehiculoDTO)))
+            .andExpect(status().isBadRequest()).andReturn();
+
+        assertEquals(result.getResolvedException().getMessage(), ErrorMessages.VEHICULO_TOPE_MOTOS);	
+    }
+    
+    @Test
+    @Transactional
+    public void crearVehiculoDiaHabil() throws Exception {
+    	//arrage
+        VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
+        VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.
+        						  conPlaca("A123").
+        						  conFechaIngreso(Instant.parse("2017-11-13T10:12:35Z")).
+        						  build();
+        
+      	//equals
+        restVehiculoMockMvc.perform(post("/api/vehiculos")
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .content(TestUtil.convertObjectToJsonBytes(vehiculoDTO)))
+            .andExpect(status().isCreated());
+    }
+    
+    @Test
+    @Transactional
+    public void crearVehiculoNoDiaHabil() throws Exception {
+    	//arrage
+        VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
+        VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.
+        						  conPlaca("A123").
+        						  conFechaIngreso(Instant.parse("2017-11-15T10:12:35Z")).
+        						  build();
+        
+      	//equals
+        MvcResult result = restVehiculoMockMvc.perform(post("/api/vehiculos")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(vehiculoDTO)))
+                .andExpect(status().isBadRequest()).andReturn();
+
+       assertEquals(result.getResolvedException().getMessage(), ErrorMessages.VEHICULO_NO_DIA_HABIL);	
+    }
+    
+    @Test
+    @Transactional
+    public void crearVehiculoYaIngresado() throws Exception {
+    	//arrage
+        VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
+        VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.build();
+        
+        //act
+        vehiculoRepository.saveAndFlush(vehiculoMapper.toEntity(vehiculoDTO));
+        
+      	//equals
+        MvcResult result = restVehiculoMockMvc.perform(post("/api/vehiculos")
+                .contentType(TestUtil.APPLICATION_JSON_UTF8)
+                .content(TestUtil.convertObjectToJsonBytes(vehiculoDTO)))
+                .andExpect(status().isBadRequest()).andReturn();
+
+       assertEquals(result.getResolvedException().getMessage(), ErrorMessages.VEHICULO_YA_INGRESADO);	
+    }
+    
+    @Test
+    @Transactional
+    public void sacarVehiculoSoloHoras() throws Exception {
+    	//arrage
+        VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
+        BigDecimal valorEsperado = BigDecimal.ZERO, horasPrueba = new BigDecimal("3");
+        Duration horas = Duration.ofHours(horasPrueba.longValue());
+        VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.conFechaIngreso(Instant.now().minus(horas)).build(), resultDTO;
+        
+        //act
+        resultDTO = vehiculoMapper.toDto(vehiculoRepository.saveAndFlush(vehiculoMapper.toEntity(vehiculoDTO)));
+        valorEsperado = resultDTO.getTipo().getValorHora().multiply(horasPrueba);
+        
+      	//equals
+        MvcResult result = restVehiculoMockMvc.perform(delete("/api/vehiculos/{id}", vehiculoDTO.getId())
+                .accept(TestUtil.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk()).andReturn();
+
+       assertEquals(new BigDecimal(result.getResponse().getHeader("valor")), valorEsperado);
+    }
+    
+    @Test
+    @Transactional
+    public void sacarVehiculoSoloDias() throws Exception {
+    	//arrage
+        VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
+        BigDecimal valorEsperado = BigDecimal.ZERO, diasPrueba = new BigDecimal("3");
+        Duration dias = Duration.ofDays(diasPrueba.longValue());
+        VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.conFechaIngreso(Instant.now().minus(dias)).build(), resultDTO;
+        
+        //act
+        resultDTO = vehiculoMapper.toDto(vehiculoRepository.saveAndFlush(vehiculoMapper.toEntity(vehiculoDTO)));
+        valorEsperado = resultDTO.getTipo().getValorDia().multiply(diasPrueba);
+        
+      	//equals
+        MvcResult result = restVehiculoMockMvc.perform(delete("/api/vehiculos/{id}", vehiculoDTO.getId())
+                .accept(TestUtil.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk()).andReturn();
+
+       assertEquals(new BigDecimal(result.getResponse().getHeader("valor")), valorEsperado);
+    }
+    
+    @Test
+    @Transactional
+    public void sacarVehiculoDiasHoras() throws Exception {
+    	//arrage
+        VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
+        BigDecimal valorEsperado = BigDecimal.ZERO, diasPrueba = new BigDecimal("1"), horasPrueba = new BigDecimal("3");
+        Duration dias = Duration.ofDays(diasPrueba.longValue());
+        Duration horas = Duration.ofHours(horasPrueba.longValue());
+        VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.conFechaIngreso(Instant.now().minus(dias).minus(horas)).build(), resultDTO;
+        
+        //act
+        resultDTO = vehiculoMapper.toDto(vehiculoRepository.saveAndFlush(vehiculoMapper.toEntity(vehiculoDTO)));
+        valorEsperado = (resultDTO.getTipo().getValorDia().multiply(diasPrueba)).
+        				 add(resultDTO.getTipo().getValorHora().multiply(horasPrueba));
+        
+      	//equals
+        MvcResult result = restVehiculoMockMvc.perform(delete("/api/vehiculos/{id}", vehiculoDTO.getId())
+                .accept(TestUtil.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk()).andReturn();
+
+       assertEquals(new BigDecimal(result.getResponse().getHeader("valor")), new BigDecimal("11000"));//valorEsperado);
     }
 /*
     @Test

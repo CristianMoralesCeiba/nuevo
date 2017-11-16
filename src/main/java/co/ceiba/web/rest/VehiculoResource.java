@@ -1,27 +1,33 @@
 package co.ceiba.web.rest;
 
-import com.codahale.metrics.annotation.Timed;
-import co.ceiba.domain.Vehiculo;
-import co.ceiba.domain.enumeration.TipoVehiculo;
-import co.ceiba.repository.VehiculoRepository;
-import co.ceiba.web.rest.errors.BadRequestAlertException;
-import co.ceiba.web.rest.util.ErrorMessages;
-import co.ceiba.web.rest.util.HeaderUtil;
-import co.ceiba.service.VehiculoService;
-import co.ceiba.service.dto.VehiculoDTO;
-import co.ceiba.service.mapper.VehiculoMapper;
-import io.github.jhipster.web.util.ResponseUtil;
+import java.math.BigDecimal;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Optional;
+
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-import java.net.URI;
-import java.net.URISyntaxException;
+import com.codahale.metrics.annotation.Timed;
 
-import java.util.List;
-import java.util.Optional;
+import co.ceiba.domain.Vehiculo;
+import co.ceiba.repository.VehiculoRepository;
+import co.ceiba.service.VehiculoService;
+import co.ceiba.service.dto.VehiculoDTO;
+import co.ceiba.service.mapper.VehiculoMapper;
+import co.ceiba.web.rest.util.HeaderUtil;
+import io.github.jhipster.web.util.ResponseUtil;
 
 /**
  * REST controller for managing Vehiculo.
@@ -57,30 +63,11 @@ public class VehiculoResource {
     public ResponseEntity<VehiculoDTO> createVehiculo(@Valid @RequestBody VehiculoDTO vehiculoDTO) throws URISyntaxException {
         log.debug("REST request to save Vehiculo : {}", vehiculoDTO);
 
-		if (vehiculoDTO.getId() != null) {
-            throw new BadRequestAlertException(ErrorMessages.NO_ID_NEW_VEHICULO, ENTITY_NAME, "idexists");
-        } else {
-	        Vehiculo vehiculo = vehiculoMapper.toEntity(vehiculoDTO);
-	        
-	        if (!vehiculoRepository.findByPlacaAndTipo(vehiculoDTO.getPlaca(), vehiculoDTO.getTipo()).isEmpty()) {
-	        	throw new BadRequestAlertException("El vehiculo ya se encuentra en el parqueadero", ENTITY_NAME, "placaexist");
-	        } else if (vehiculoDTO.getTipo().equals(TipoVehiculo.MOTO)){
-	        	if (!vehiculoService.hayCupo(TipoVehiculo.MOTO)) {
-	            	throw new BadRequestAlertException(ErrorMessages.VEHICULOS_TOPE_MOTOS, ENTITY_NAME, "motomax");
-	            }
-	        } else if (vehiculoDTO.getTipo().equals(TipoVehiculo.CARRO)){
-	        	if (!vehiculoService.hayCupo(TipoVehiculo.CARRO)) {
-	            	throw new BadRequestAlertException("Ya no hay cupo para carros", ENTITY_NAME, "carromax");
-	            }
-	        }
-	        
-	        vehiculo = vehiculoRepository.save(vehiculo);
-	        VehiculoDTO result = vehiculoMapper.toDto(vehiculo);
-	        
-	        return ResponseEntity.created(new URI("/api/vehiculos/" + result.getId()))
-	            .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
-	            .body(result);
-        }
+        VehiculoDTO result = vehiculoMapper.toDto(vehiculoService.crearVehiculo(vehiculoDTO));
+        
+        return ResponseEntity.created(new URI("/api/vehiculos/" + result.getId()))
+            .headers(HeaderUtil.createEntityCreationAlert(ENTITY_NAME, result.getId().toString()))
+            .body(result); 
     }
 
     /**
@@ -119,9 +106,14 @@ public class VehiculoResource {
      */
     @DeleteMapping("/vehiculos/{id}")
     @Timed
-    public ResponseEntity<Void> deleteVehiculo(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteVehiculo(@PathVariable Long id) throws URISyntaxException{
         log.debug("REST request to delete Vehiculo : {}", id);
-        vehiculoRepository.delete(id);
-        return ResponseEntity.ok().headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).build();
+        
+        BigDecimal valor = vehiculoService.sacarVehiculo(id);
+        
+        return ResponseEntity.ok().
+        		headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).
+        		headers(HeaderUtil.createEntityValueDeletionAlert(valor)).
+        		build();
     }
 }
