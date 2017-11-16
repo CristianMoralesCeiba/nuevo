@@ -118,7 +118,7 @@ public class VehiculoResourceIntTest {
     public void createVehiculoWithExistingId() throws Exception {
     	//arrage
         VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
-        
+                
         // Create the Vehiculo
         VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.conID(1L).build();
         // An entity with an existing ID cannot be created, so this API call must fail
@@ -145,7 +145,7 @@ public class VehiculoResourceIntTest {
         }
         
         //equals
-        vehiculoDTO = vehiculoTestDataBuilder.conPlaca("10" + vehiculoTestDataBuilder.PLACA).build();
+        vehiculoDTO = vehiculoTestDataBuilder.conPlaca(TipoVehiculo.CARRO.getCupo() + vehiculoTestDataBuilder.PLACA).build();
         
         MvcResult result = restVehiculoMockMvc.perform(post("/api/vehiculos")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
@@ -161,6 +161,7 @@ public class VehiculoResourceIntTest {
     	//arrage
         VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
         VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.conTipo(TipoVehiculo.CARRO).build();
+        vehiculoRepository.findAll();
         
         //act
         for (int i = 0; i < vehiculoDTO.getTipo().getCupo(); i++){
@@ -169,16 +170,17 @@ public class VehiculoResourceIntTest {
             
         	vehiculoRepository.saveAndFlush(vehiculoMapper.toEntity(vehiculoDTO));
         }
+        vehiculoRepository.findAll();
         
       	//equals
-        vehiculoDTO = vehiculoTestDataBuilder.conPlaca("10" + vehiculoTestDataBuilder.PLACA).build();
+        vehiculoDTO = vehiculoTestDataBuilder.conPlaca(TipoVehiculo.CARRO.getCupo() + vehiculoTestDataBuilder.PLACA).build();
         
         MvcResult result = restVehiculoMockMvc.perform(post("/api/vehiculos")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(vehiculoDTO)))
             .andExpect(status().isBadRequest()).andReturn();
 
-        assertEquals(result.getResolvedException().getMessage(), ErrorMessages.VEHICULO_TOPE_MOTOS);	
+        assertEquals(result.getResolvedException().getMessage(), ErrorMessages.VEHICULO_TOPE_CARRROS);	
     }
     
     @Test
@@ -300,6 +302,28 @@ public class VehiculoResourceIntTest {
 
        assertEquals(new BigDecimal(result.getResponse().getHeader("valor")), new BigDecimal("11000"));//valorEsperado);
     }
+    
+
+    @Test
+    @Transactional
+    public void deleteVehiculo() throws Exception {
+    	 VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
+         VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.build();
+         
+    	// Initialize the database
+        vehiculoRepository.saveAndFlush(vehiculoMapper.toEntity(vehiculoDTO));
+        int databaseSizeBeforeDelete = vehiculoRepository.findAll().size();
+
+        // Get the vehiculo
+        restVehiculoMockMvc.perform(delete("/api/vehiculos/{id}", vehiculoDTO.getId())
+            .accept(TestUtil.APPLICATION_JSON_UTF8))
+            .andExpect(status().isOk());
+
+        // Validate the database is empty
+        List<Vehiculo> vehiculoList = vehiculoRepository.findAll();
+        assertThat(vehiculoList).hasSize(databaseSizeBeforeDelete - 1);
+    }
+
 /*
     @Test
     @Transactional
@@ -417,23 +441,6 @@ public class VehiculoResourceIntTest {
         // Validate the Vehiculo in the database
         List<Vehiculo> vehiculoList = vehiculoRepository.findAll();
         assertThat(vehiculoList).hasSize(databaseSizeBeforeUpdate + 1);
-    }
-
-    @Test
-    @Transactional
-    public void deleteVehiculo() throws Exception {
-        // Initialize the database
-        vehiculoRepository.saveAndFlush(vehiculo);
-        int databaseSizeBeforeDelete = vehiculoRepository.findAll().size();
-
-        // Get the vehiculo
-        restVehiculoMockMvc.perform(delete("/api/vehiculos/{id}", vehiculo.getId())
-            .accept(TestUtil.APPLICATION_JSON_UTF8))
-            .andExpect(status().isOk());
-
-        // Validate the database is empty
-        List<Vehiculo> vehiculoList = vehiculoRepository.findAll();
-        assertThat(vehiculoList).hasSize(databaseSizeBeforeDelete - 1);
     }
 
     @Test

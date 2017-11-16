@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoField;
 
 import org.slf4j.Logger;
@@ -43,35 +45,34 @@ public class VehiculoService {
         } else {
 	        Vehiculo vehiculo = vehiculoMapper.toEntity(vehiculoDTO);
 	        
-	        if (!vehiculoRepository.findByPlacaAndTipo(vehiculoDTO.getPlaca(), vehiculoDTO.getTipo()).isEmpty()) {
-	        	throw new BadRequestAlertException(ErrorMessages.VEHICULO_YA_INGRESADO, ENTITY_NAME, "placaexist");
-	        } else if (vehiculoDTO.getTipo().equals(TipoVehiculo.MOTO)){
-	        	if (!hayCupo(TipoVehiculo.MOTO)) {
-	            	throw new BadRequestAlertException(ErrorMessages.VEHICULO_TOPE_MOTOS, ENTITY_NAME, "motomax");
-	            }
-	        } else if (vehiculoDTO.getTipo().equals(TipoVehiculo.CARRO)){
-	        	if (!hayCupo(TipoVehiculo.CARRO)) {
-	            	throw new BadRequestAlertException(ErrorMessages.VEHICULO_TOPE_CARRROS, ENTITY_NAME, "carromax");
-	            }
-	        } else if (!esDiaHabil(vehiculoDTO.getPlaca(), vehiculoDTO.getFechaIngreso())){
-	        	throw new BadRequestAlertException(ErrorMessages.VEHICULO_NO_DIA_HABIL, ENTITY_NAME, "dianohabil");
-	        }
-	        
+		        if (!vehiculoRepository.findByPlacaAndTipo(vehiculoDTO.getPlaca(), vehiculoDTO.getTipo()).isEmpty()) {
+		        	throw new BadRequestAlertException(ErrorMessages.VEHICULO_YA_INGRESADO, ENTITY_NAME, "placaexist");
+		        } else if (!esDiaHabil(vehiculoDTO.getPlaca(), vehiculoDTO.getFechaIngreso())){
+		        	throw new BadRequestAlertException(ErrorMessages.VEHICULO_NO_DIA_HABIL, ENTITY_NAME, "dianohabil");
+		        } else if (vehiculoDTO.getTipo().equals(TipoVehiculo.MOTO)){
+		        	if (!hayCupo(TipoVehiculo.MOTO)) {
+		            	throw new BadRequestAlertException(ErrorMessages.VEHICULO_TOPE_MOTOS, ENTITY_NAME, "motomax");
+		            }
+		        } else if (vehiculoDTO.getTipo().equals(TipoVehiculo.CARRO)){
+		        	if (!hayCupo(TipoVehiculo.CARRO)) {
+		            	throw new BadRequestAlertException(ErrorMessages.VEHICULO_TOPE_CARRROS, ENTITY_NAME, "carromax");
+		            }
+		        } 	        
 	        return vehiculoRepository.save(vehiculo);
         }
 	}
 	
 	public boolean hayCupo (TipoVehiculo tipo){
 		
-		if (vehiculoRepository.findByTipo(tipo).isEmpty() && vehiculoRepository.findByTipo(tipo).size() > tipo.getCupo()) {
+		if (!vehiculoRepository.findByTipo(tipo).isEmpty() && vehiculoRepository.findByTipo(tipo).size() <= tipo.getCupo()) {
         	return false;
         }
 		return true;
 	}
 	
 	public boolean esDiaHabil(String placa, Instant fecha){
-	
-		int dia = fecha.get(ChronoField.DAY_OF_WEEK);
+
+		int dia = LocalDateTime.ofInstant(fecha, ZoneId.systemDefault()).get(ChronoField.DAY_OF_WEEK);
 		
 		switch (placa.substring(0, 1)){
 			case "A":
@@ -122,15 +123,15 @@ public class VehiculoService {
 					valor = valor.add(EXCEDENTE_CILINDRAJE);
 				}
 				
-				log.debug("Sacar vehiculo : El valor es: " + valor + " dias " + dias + " horas " + horas);
+				log.debug("Sacar vehiculo : El valor es: " + valor + " dias5 " + dias + " horas " + horas);
 				
 				vehiculoRepository.delete(vehiculoDTO.getId());
 				
 				return valor;
 				
-			} else {
-				throw new BadRequestAlertException(ErrorMessages.VEHICULO_FECHA_MAYOR, ENTITY_NAME, "fechanovalida");
-			}	
+			} 
+			
+			return new BigDecimal(tiempoEnParqueadero.toString());
 		}
 	}
 	
