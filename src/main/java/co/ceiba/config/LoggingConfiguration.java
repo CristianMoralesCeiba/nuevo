@@ -41,15 +41,12 @@ public class LoggingConfiguration {
 
     private final String serverPort;
 
-    private final EurekaInstanceConfigBean eurekaInstanceConfigBean;
-
     private final JHipsterProperties jHipsterProperties;
 
     public LoggingConfiguration(@Value("${spring.application.name}") String appName, @Value("${server.port}") String serverPort,
         EurekaInstanceConfigBean eurekaInstanceConfigBean, JHipsterProperties jHipsterProperties) {
         this.appName = appName;
         this.serverPort = serverPort;
-        this.eurekaInstanceConfigBean = eurekaInstanceConfigBean;
         this.jHipsterProperties = jHipsterProperties;
         if (jHipsterProperties.getLogging().getLogstash().isEnabled()) {
             addLogstashAppender(context);
@@ -70,7 +67,7 @@ public class LoggingConfiguration {
         log.info("Initializing Logstash logging");
 
         LogstashTcpSocketAppender logstashAppender = new LogstashTcpSocketAppender();
-        logstashAppender.setName("LOGSTASH");
+        logstashAppender.setName(LOGSTASH_APPENDER_NAME);
         logstashAppender.setContext(context);
         String customFields = "{\"app_name\":\"" + appName + "\",\"app_port\":\"" + serverPort + "\"}";
 
@@ -92,7 +89,7 @@ public class LoggingConfiguration {
         // Wrap the appender in an Async appender for performance
         AsyncAppender asyncLogstashAppender = new AsyncAppender();
         asyncLogstashAppender.setContext(context);
-        asyncLogstashAppender.setName("ASYNC_LOGSTASH");
+        asyncLogstashAppender.setName(ASYNC_LOGSTASH_APPENDER_NAME);
         asyncLogstashAppender.setQueueSize(jHipsterProperties.getLogging().getLogstash().getQueueSize());
         asyncLogstashAppender.addAppender(logstashAppender);
         asyncLogstashAppender.start();

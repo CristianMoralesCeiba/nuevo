@@ -1,15 +1,12 @@
 package co.ceiba.service;
 
 import java.math.BigDecimal;
-import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoField;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import co.ceiba.domain.Vehiculo;
@@ -24,11 +21,10 @@ import co.ceiba.web.rest.util.ErrorMessages;
 public class VehiculoService {
 
 	private static final String ENTITY_NAME = "vehiculo";
-	private final int MAX_COBRO_HORA = 9;
-	private final BigDecimal EXCEDENTE_CILINDRAJE = new BigDecimal("2000");
-	private final int ALTO_CILINDRAJE = 500;
+	private static final int MAX_COBRO_HORA = 9;
+	private static final BigDecimal EXCEDENTE_CILINDRAJE = new BigDecimal("2000");
+	private static final int ALTO_CILINDRAJE = 500;
 
-    private final Logger log = LoggerFactory.getLogger(VehiculoService.class);
     private final VehiculoMapper vehiculoMapper;
 	
 	private final VehiculoRepository vehiculoRepository;
@@ -39,7 +35,7 @@ public class VehiculoService {
 		this.vehiculoMapper = vehiculoMapper;
 	}
 	
-	public Vehiculo crearVehiculo(VehiculoDTO vehiculoDTO) throws URISyntaxException {
+	public Vehiculo crearVehiculo(VehiculoDTO vehiculoDTO) throws Exception {
 		if (vehiculoDTO.getId() != null) {
             throw new BadRequestAlertException(ErrorMessages.VEHICULO_NO_ID_NEW, ENTITY_NAME, "idexists");
         } else {
@@ -49,25 +45,17 @@ public class VehiculoService {
 		        	throw new BadRequestAlertException(ErrorMessages.VEHICULO_YA_INGRESADO, ENTITY_NAME, "placaexist");
 		        } else if (!esDiaHabil(vehiculoDTO.getPlaca(), vehiculoDTO.getFechaIngreso())){
 		        	throw new BadRequestAlertException(ErrorMessages.VEHICULO_NO_DIA_HABIL, ENTITY_NAME, "dianohabil");
-		        } else if (vehiculoDTO.getTipo().equals(TipoVehiculo.MOTO)){
-		        	if (!hayCupo(TipoVehiculo.MOTO)) {
-		            	throw new BadRequestAlertException(ErrorMessages.VEHICULO_TOPE_MOTOS, ENTITY_NAME, "motomax");
-		            }
-		        } else if (vehiculoDTO.getTipo().equals(TipoVehiculo.CARRO)){
-		        	if (!hayCupo(TipoVehiculo.CARRO)) {
+		        } else if (vehiculoDTO.getTipo().equals(TipoVehiculo.MOTO) && !hayCupo(TipoVehiculo.MOTO)){
+		            throw new BadRequestAlertException(ErrorMessages.VEHICULO_TOPE_MOTOS, ENTITY_NAME, "motomax");
+		        } else if (vehiculoDTO.getTipo().equals(TipoVehiculo.CARRO) && !hayCupo(TipoVehiculo.CARRO)){
 		            	throw new BadRequestAlertException(ErrorMessages.VEHICULO_TOPE_CARRROS, ENTITY_NAME, "carromax");
-		            }
 		        } 	        
 	        return vehiculoRepository.save(vehiculo);
         }
 	}
 	
 	public boolean hayCupo (TipoVehiculo tipo){
-		
-		if (!vehiculoRepository.findByTipo(tipo).isEmpty() && vehiculoRepository.findByTipo(tipo).size() >= tipo.getCupo()) {
-        	return false;
-        }
-		return true;
+		return !vehiculoRepository.findByTipo(tipo).isEmpty() && vehiculoRepository.findByTipo(tipo).size() >= tipo.getCupo();
 	}
 	
 	public boolean esDiaHabil(String placa, Instant fecha){
@@ -86,7 +74,7 @@ public class VehiculoService {
 		return true;
 	}
 	
-	public BigDecimal sacarVehiculo (Long id) throws URISyntaxException {
+	public BigDecimal sacarVehiculo (Long id) throws Exception {
 		
 		Vehiculo vehiculo = vehiculoRepository.findOne(id);
 		
