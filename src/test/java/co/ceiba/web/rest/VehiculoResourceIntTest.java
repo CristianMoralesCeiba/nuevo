@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -257,7 +258,7 @@ public class VehiculoResourceIntTest {
                 .accept(TestUtil.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk()).andReturn();
 
-        boolean valor = result.getResponse().getHeaders("X-nuevoApp-alert").contains(valorEsperado.toString());
+        boolean valor = result.getResponse().getHeaders("X-nuevoApp-alert").contains(VehiculoResource.MENSAJE_VALOR + NumberFormat.getCurrencyInstance().format(valorEsperado) + " COP");
         boolean params = result.getResponse().getHeaders("X-nuevoApp-params").contains("valor");
         
         assertTrue(valor && params);
@@ -281,8 +282,8 @@ public class VehiculoResourceIntTest {
         MvcResult result = restVehiculoMockMvc.perform(delete("/api/vehiculos/{id}", vehiculo.getId())
                 .accept(TestUtil.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk()).andReturn();
-        
-        boolean valor = result.getResponse().getHeaders("X-nuevoApp-alert").contains(valorEsperado.toString());
+
+        boolean valor = result.getResponse().getHeaders("X-nuevoApp-alert").contains(VehiculoResource.MENSAJE_VALOR + NumberFormat.getCurrencyInstance().format(valorEsperado) + " COP");
         boolean params = result.getResponse().getHeaders("X-nuevoApp-params").contains("valor");
         
         assertTrue(valor && params);
@@ -309,7 +310,7 @@ public class VehiculoResourceIntTest {
                 .accept(TestUtil.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk()).andReturn();
 
-        boolean valor = result.getResponse().getHeaders("X-nuevoApp-alert").contains(valorEsperado.toString());
+        boolean valor = result.getResponse().getHeaders("X-nuevoApp-alert").contains(VehiculoResource.MENSAJE_VALOR + NumberFormat.getCurrencyInstance().format(valorEsperado) + " COP");
         boolean params = result.getResponse().getHeaders("X-nuevoApp-params").contains("valor");
         
         assertTrue(valor && params);

@@ -40,6 +40,8 @@ public class VehiculoResource {
 
     private static final String ENTITY_NAME = "vehiculo";
 
+    public static final String MENSAJE_VALOR = "El valor a cobrar es: ";
+
     private final VehiculoRepository vehiculoRepository;
 
     private final VehiculoMapper vehiculoMapper;
@@ -113,7 +115,7 @@ public class VehiculoResource {
         
         return ResponseEntity.ok().
         		headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).
-        		headers(HeaderUtil.createEntityValueDeletionAlert(valor)).
+        		headers(HeaderUtil.createEntityValueDeletionAlert(MENSAJE_VALOR, valor)).
         		build();
     }
 }

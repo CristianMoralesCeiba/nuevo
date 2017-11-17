@@ -1,10 +1,10 @@
 <div>
     <h2>
-        <span>Vehiculos</span>
+        <span>Parqueadero</span>
         <button class="btn btn-primary float-right jh-create-entity create-vehiculo" [routerLink]="['/', { outlets: { popup: ['vehiculo-new'] } }]">
             <span class="fa fa-plus"></span>
             <span >
-            Create new Vehiculo
+            Ingresar vehiculo
             </span>
         </button>
     </h2>
@@ -16,7 +16,7 @@
         <table class="table table-striped">
             <thead>
             <tr>
-            <th><span>ID</span></th>
+            <th><span>Ticket</span></th>
             <th><span>Placa</span></th>
             <th><span>Tipo</span></th>
             <th><span>Cilindraje</span></th>
@@ -37,21 +37,14 @@
                                 [routerLink]="['../vehiculo', vehiculo.id ]"
                                 class="btn btn-info btn-sm">
                             <span class="fa fa-eye"></span>
-                            <span class="d-none d-md-inline">View</span>
-                        </button>
-                        <button type="submit"
-                                [routerLink]="['/', { outlets: { popup: 'vehiculo/'+ vehiculo.id + '/edit'} }]"
-                                replaceUrl="true"
-                                class="btn btn-primary btn-sm">
-                            <span class="fa fa-pencil"></span>
-                            <span class="d-none d-md-inline">Edit</span>
+                            <span class="d-none d-md-inline">Ver detalle</span>
                         </button>
                         <button type="submit"
                                 [routerLink]="['/', { outlets: { popup: 'vehiculo/'+ vehiculo.id + '/delete'} }]"
                                 replaceUrl="true"
                                 class="btn btn-danger btn-sm">
                             <span class="fa fa-remove"></span>
-                            <span class="d-none d-md-inline">Delete</span>
+                            <span class="d-none d-md-inline">Salida vehiculo</span>
                         </button>
                     </div>
                 </td>

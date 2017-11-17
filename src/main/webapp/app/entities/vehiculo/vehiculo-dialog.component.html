@@ -1,7 +1,7 @@
 <form name="editForm" role="form" novalidate (ngSubmit)="save()" #editForm="ngForm">
 
     <div class="modal-header">
-        <h4 class="modal-title" id="myVehiculoLabel">Create or edit a Vehiculo</h4>
+        <h4 class="modal-title" id="myVehiculoLabel">Ingresar un Vehiculo</h4>
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true"
                 (click)="clear()">&times;</button>
     </div>
@@ -19,7 +19,7 @@
             <div [hidden]="!(editForm.controls.placa?.dirty && editForm.controls.placa?.invalid)">
                 <small class="form-text text-danger"
                    [hidden]="!editForm.controls.placa?.errors?.required">
-                   This field is required.
+                   Este campo es requerido
                 </small>
             </div>
         </div>
@@ -32,7 +32,7 @@
             <div [hidden]="!(editForm.controls.tipo?.dirty && editForm.controls.tipo?.invalid)">
                 <small class="form-text text-danger"
                    [hidden]="!editForm.controls.tipo?.errors?.required">
-                   This field is required.
+                   Este campo es requerido
                 </small>
             </div>
         </div>
@@ -50,11 +50,11 @@
             <div [hidden]="!(editForm.controls.fechaIngreso?.dirty && editForm.controls.fechaIngreso?.invalid)">
                 <small class="form-text text-danger"
                    [hidden]="!editForm.controls.fechaIngreso?.errors?.required">
-                   This field is required.
+                   Este campo es requerido
                 </small>
                 <small class="form-text text-danger"
                     [hidden]="!editForm.controls.fechaIngreso?.errors?.ZonedDateTimelocal">
-                    This field should be a date and time.
+                    Este campo debe contener fecha y hora de ingreso
                 </small>
             </div>
         </div>
@@ -62,10 +62,10 @@
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="clear()">
-            <span class="fa fa-ban"></span>&nbsp;<span>Cancel</span>
+            <span class="fa fa-ban"></span>&nbsp;<span>Cancelar</span>
         </button>
         <button type="submit" [disabled]="editForm.form.invalid || isSaving" class="btn btn-primary">
-            <span class="fa fa-save"></span>&nbsp;<span>Save</span>
+            <span class="fa fa-save"></span>&nbsp;<span>Ingresar</span>
         </button>
     </div>
 </form>

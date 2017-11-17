@@ -64,7 +64,7 @@ public class VehiculoService {
 	
 	public boolean hayCupo (TipoVehiculo tipo){
 		
-		if (!vehiculoRepository.findByTipo(tipo).isEmpty() && vehiculoRepository.findByTipo(tipo).size() <= tipo.getCupo()) {
+		if (!vehiculoRepository.findByTipo(tipo).isEmpty() && vehiculoRepository.findByTipo(tipo).size() >= tipo.getCupo()) {
         	return false;
         }
 		return true;
@@ -117,7 +117,7 @@ public class VehiculoService {
 					valor = BigDecimal.ONE.multiply(vehiculoDTO.getTipo().getValorHora());	
 				}
 				
-				if (vehiculoDTO.getCilindraje() >= ALTO_CILINDRAJE){
+				if (vehiculoDTO.getCilindraje() != null && vehiculoDTO.getCilindraje() >= ALTO_CILINDRAJE){
 					valor = valor.add(EXCEDENTE_CILINDRAJE);
 				}
 								

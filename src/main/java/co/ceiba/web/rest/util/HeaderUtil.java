@@ -1,6 +1,7 @@
 package co.ceiba.web.rest.util;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,7 @@ public final class HeaderUtil {
     }
 
     public static HttpHeaders createEntityCreationAlert(String entityName, String param) {
-        return createAlert("A new " + entityName + " is created with identifier " + param, param);
+        return createAlert("Un nuevo " + entityName + " fue ingresado al parqueadero." + param, param);
     }
 
     public static HttpHeaders createEntityUpdateAlert(String entityName, String param) {
@@ -34,8 +35,8 @@ public final class HeaderUtil {
         return createAlert("A " + entityName + " is deleted with identifier " + id, id);
     }
     
-    public static HttpHeaders createEntityValueDeletionAlert(BigDecimal valor) {
-        return createAlert(valor.toString(), "valor");
+    public static HttpHeaders createEntityValueDeletionAlert(String mensaje, BigDecimal valor) {
+        return createAlert(mensaje + NumberFormat.getCurrencyInstance().format(valor) + " COP", "valor");
     }
     
     public static HttpHeaders createFailureAlert(String entityName, String errorKey, String defaultMessage) {
