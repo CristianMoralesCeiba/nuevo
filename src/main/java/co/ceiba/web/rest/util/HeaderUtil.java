@@ -40,7 +40,7 @@ public final class HeaderUtil {
     }
     
     public static HttpHeaders createFailureAlert(String entityName, String errorKey, String defaultMessage) {
-        log.error("Entity processing failed, {}", defaultMessage);
+        log.error("Entity processing failed, {}", defaultMessage + " key " + errorKey);
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-nuevoApp-error", defaultMessage);
         headers.add("X-nuevoApp-params", entityName);

@@ -1,4 +1,4 @@
-package co.ceiba.web.rest;
+		package co.ceiba.web.rest;
 
 import com.codahale.metrics.annotation.Timed;
 
@@ -59,7 +59,7 @@ public class AccountResource {
         if (!checkPasswordLength(managedUserVM.getPassword())) {
             throw new InvalidPasswordException();
         }
-        userRepository.findOneByLogin(managedUserVM.getLogin().toLowerCase()).ifPresent(u -> {throw new LoginAlreadyUsedException();});
+        userRepository.findOneByLogin(managedUserVM.getLogin().toLowerCase()		).ifPresent(u -> {throw new LoginAlreadyUsedException();});
         userRepository.findOneByEmailIgnoreCase(managedUserVM.getEmail()).ifPresent(u -> {throw new EmailAlreadyUsedException();});
         User user = userService.registerUser(managedUserVM);
         mailService.sendActivationEmail(user);
@@ -77,7 +77,7 @@ public class AccountResource {
         Optional<User> user = userService.activateRegistration(key);
         if (!user.isPresent()) {
             throw new InternalServerErrorException("No user was found for this reset key");
-        };
+        }
     }
 
     /**

@@ -108,7 +108,7 @@ public class VehiculoResource {
      */
     @DeleteMapping("/vehiculos/{id}")
     @Timed
-    public ResponseEntity<Void> deleteVehiculo(@PathVariable Long id) throws URISyntaxException	{
+    public ResponseEntity<Void> deleteVehiculo(@PathVariable Long id) {
         log.debug("REST request to delete Vehiculo : {}", id);
         
         BigDecimal valor = vehiculoService.sacarVehiculo(id);

@@ -81,7 +81,7 @@ public class VehiculoService {
 			
 			long[] tiempo = calcularTiempoEnParqueadero (vehiculoDTO);
 			
-			if (tiempo != null && tiempo.length > 1){
+			if (tiempo.length > 1){
 				
 				vehiculoRepository.delete(vehiculoDTO.getId());
 				
@@ -109,7 +109,7 @@ public class VehiculoService {
 			return new long[]{dias, horas};
 		}
 		
-		return null;
+		return new long[0];
 	}
 	
 	public BigDecimal calcularValorParqueadero (VehiculoDTO vehiculoDTO, long dias, long horas){
