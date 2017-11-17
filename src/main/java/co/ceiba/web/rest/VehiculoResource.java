@@ -113,7 +113,7 @@ public class VehiculoResource {
         
         return ResponseEntity.ok().
         		headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).
-        		headers(HeaderUtil.createEntityValueDeletionAlert(valor)).
+        		//headers(HeaderUtil.createEntityValueDeletionAlert(valor)).
         		build();
     }
 }
