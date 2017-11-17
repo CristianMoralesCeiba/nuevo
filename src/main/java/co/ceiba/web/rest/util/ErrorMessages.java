@@ -11,4 +11,9 @@ public class ErrorMessages {
 	public static final String VEHICULO_NO_EXISTE = "El vehiculo no se encuentra en el parqueadero";
 	public static final String VEHICULO_INCALCULABLE = "No se puede calcular el valor.";
 	
+	private ErrorMessages() {
+		super();		
+	}	
+	
+	
 }
