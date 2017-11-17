@@ -120,7 +120,7 @@ public class VehiculoResourceIntTest {
             .content(TestUtil.convertObjectToJsonBytes(vehiculoDTO)))
             .andExpect(status().isBadRequest()).andReturn();
 
-        assertEquals(result.getResolvedException().getMessage(), ErrorMessages.VEHICULO_NO_ID_NEW);	
+        assertEquals(ErrorMessages.VEHICULO_NO_ID_NEW, result.getResolvedException().getMessage());	
     }
     
     @Test
@@ -145,7 +145,7 @@ public class VehiculoResourceIntTest {
             .content(TestUtil.convertObjectToJsonBytes(vehiculoDTO)))
             .andExpect(status().isBadRequest()).andReturn();
 
-        assertEquals(result.getResolvedException().getMessage(), ErrorMessages.VEHICULO_TOPE_MOTOS);	
+        assertEquals(ErrorMessages.VEHICULO_TOPE_MOTOS, result.getResolvedException().getMessage());	
     }
     
     @Test
@@ -154,8 +154,7 @@ public class VehiculoResourceIntTest {
     	//arrage
         VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
         VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.conTipo(TipoVehiculo.CARRO).build();
-        vehiculoRepository.findAll();
-        
+
         //act
         for (int i = 0; i < vehiculoDTO.getTipo().getCupo(); i++){
             vehiculoDTO = vehiculoTestDataBuilder.conTipo(TipoVehiculo.CARRO)
@@ -163,7 +162,6 @@ public class VehiculoResourceIntTest {
             
         	vehiculoRepository.saveAndFlush(vehiculoMapper.toEntity(vehiculoDTO));
         }
-        vehiculoRepository.findAll();
         
       	//equals
         vehiculoDTO = vehiculoTestDataBuilder.conPlaca(TipoVehiculo.CARRO.getCupo() + vehiculoTestDataBuilder.PLACA).build();
@@ -173,7 +171,7 @@ public class VehiculoResourceIntTest {
             .content(TestUtil.convertObjectToJsonBytes(vehiculoDTO)))
             .andExpect(status().isBadRequest()).andReturn();
 
-        assertEquals(result.getResolvedException().getMessage(), ErrorMessages.VEHICULO_TOPE_CARRROS);	
+        assertEquals(ErrorMessages.VEHICULO_TOPE_CARRROS, result.getResolvedException().getMessage());	
     }
     
     @Test
@@ -209,7 +207,7 @@ public class VehiculoResourceIntTest {
                 .content(TestUtil.convertObjectToJsonBytes(vehiculoDTO)))
                 .andExpect(status().isBadRequest()).andReturn();
 
-       assertEquals(result.getResolvedException().getMessage(), ErrorMessages.VEHICULO_NO_DIA_HABIL);	
+       assertEquals(ErrorMessages.VEHICULO_NO_DIA_HABIL, result.getResolvedException().getMessage());	
     }
     
     @Test
@@ -228,7 +226,7 @@ public class VehiculoResourceIntTest {
                 .content(TestUtil.convertObjectToJsonBytes(vehiculoDTO)))
                 .andExpect(status().isBadRequest()).andReturn();
 
-       assertEquals(result.getResolvedException().getMessage(), ErrorMessages.VEHICULO_YA_INGRESADO);	
+       assertEquals(ErrorMessages.VEHICULO_YA_INGRESADO, result.getResolvedException().getMessage());	
     }
     
     @Test

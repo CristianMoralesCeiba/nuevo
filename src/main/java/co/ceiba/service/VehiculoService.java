@@ -84,7 +84,7 @@ public class VehiculoService {
 			if (!tiempoEnParqueadero.isZero() && 
 				!tiempoEnParqueadero.isNegative()){
 				
-				BigDecimal valor = BigDecimal.ZERO;
+				BigDecimal valor;
 	
 				long dias = tiempoEnParqueadero.toDays();
 				long horas = tiempoEnParqueadero.toHours() - (dias * 24);
