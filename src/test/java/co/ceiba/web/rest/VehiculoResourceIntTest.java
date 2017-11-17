@@ -1,15 +1,18 @@
 package co.ceiba.web.rest;
 
-import co.ceiba.NuevoApp;
+import static co.ceiba.web.rest.TestUtil.createFormattingConversionService;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import co.ceiba.domain.Vehiculo;
-import co.ceiba.repository.VehiculoRepository;
-import co.ceiba.service.VehiculoService;
-import co.ceiba.service.dto.VehiculoDTO;
-import co.ceiba.service.mapper.VehiculoMapper;
-import co.ceiba.web.rest.errors.ExceptionTranslator;
-import co.ceiba.web.rest.testDataBuilder.VehiculoTestDataBuilder;
-import co.ceiba.web.rest.util.ErrorMessages;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +21,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
-import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,23 +28,16 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-
-import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.List;
-
-import static co.ceiba.web.rest.TestUtil.createFormattingConversionService;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.hasItem;
-import static org.junit.Assert.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
+import co.ceiba.NuevoApp;
+import co.ceiba.domain.Vehiculo;
 import co.ceiba.domain.enumeration.TipoVehiculo;
+import co.ceiba.repository.VehiculoRepository;
+import co.ceiba.service.VehiculoService;
+import co.ceiba.service.dto.VehiculoDTO;
+import co.ceiba.service.mapper.VehiculoMapper;
+import co.ceiba.web.rest.errors.ExceptionTranslator;
+import co.ceiba.web.rest.testDataBuilder.VehiculoTestDataBuilder;
+import co.ceiba.web.rest.util.ErrorMessages;
 /**
  * Test class for the VehiculoResource REST controller.
  *
@@ -70,9 +65,6 @@ public class VehiculoResourceIntTest {
 
     @Autowired
     private VehiculoService vehiculoService;
-    
-    @Autowired
-    private EntityManager em;
 
     private MockMvc restVehiculoMockMvc;
     

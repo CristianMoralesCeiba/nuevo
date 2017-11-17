@@ -1,7 +1,6 @@
 package co.ceiba.service;
 
 import java.math.BigDecimal;
-import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -36,7 +35,7 @@ public class VehiculoService {
 		this.vehiculoMapper = vehiculoMapper;
 	}
 	
-	public Vehiculo crearVehiculo(VehiculoDTO vehiculoDTO) throws URISyntaxException {
+	public Vehiculo crearVehiculo(VehiculoDTO vehiculoDTO) throws Exception {
 		if (vehiculoDTO.getId() != null) {
             throw new BadRequestAlertException(ErrorMessages.VEHICULO_NO_ID_NEW, ENTITY_NAME, "idexists");
         } else {
@@ -56,16 +55,22 @@ public class VehiculoService {
 	}
 	
 	public boolean hayCupo (TipoVehiculo tipo){
-		return !vehiculoRepository.findByTipo(tipo).isEmpty() && vehiculoRepository.findByTipo(tipo).size() >= tipo.getCupo();
+		
+		return !(!vehiculoRepository.findByTipo(tipo).isEmpty() && vehiculoRepository.findByTipo(tipo).size() >= tipo.getCupo());
 	}
 	
 	public boolean esDiaHabil(String placa, Instant fecha){
+
 		int dia = LocalDateTime.ofInstant(fecha, ZoneId.systemDefault()).get(ChronoField.DAY_OF_WEEK);
 		
-		return placa.substring(0, 1).equals("A") && (dia == 1 || dia == 7);	
+		if (placa.substring(0, 1).equals("A")){
+			return dia == 1 || dia == 7;
+		} else {
+			return true;
+		}
 	}
 	
-	public BigDecimal sacarVehiculo (Long id) throws URISyntaxException {
+	public BigDecimal sacarVehiculo (Long id) throws Exception {
 		
 		Vehiculo vehiculo = vehiculoRepository.findOne(id);
 		
@@ -79,7 +84,7 @@ public class VehiculoService {
 			if (!tiempoEnParqueadero.isZero() && 
 				!tiempoEnParqueadero.isNegative()){
 				
-				BigDecimal valor;
+				BigDecimal valor = BigDecimal.ZERO;
 	
 				long dias = tiempoEnParqueadero.toDays();
 				long horas = tiempoEnParqueadero.toHours() - (dias * 24);
