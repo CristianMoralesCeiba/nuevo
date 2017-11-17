@@ -9,5 +9,6 @@ public class ErrorMessages {
 	public static final String VEHICULO_YA_INGRESADO = "El vehiculo ya se encuentra en el parqueadero";
 	public static final String VEHICULO_FECHA_MAYOR = "La fecha de ingreso no puede ser mayor a la actual";
 	public static final String VEHICULO_NO_EXISTE = "El vehiculo no se encuentra en el parqueadero";
+	public static final String VEHICULO_INCALCULABLE = "No se puede calcular el valor.";
 	
 }

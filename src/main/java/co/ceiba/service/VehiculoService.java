@@ -35,7 +35,7 @@ public class VehiculoService {
 		this.vehiculoMapper = vehiculoMapper;
 	}
 	
-	public Vehiculo crearVehiculo(VehiculoDTO vehiculoDTO) throws Exception {
+	public Vehiculo crearVehiculo(VehiculoDTO vehiculoDTO) {
 		if (vehiculoDTO.getId() != null) {
             throw new BadRequestAlertException(ErrorMessages.VEHICULO_NO_ID_NEW, ENTITY_NAME, "idexists");
         } else {
@@ -70,7 +70,7 @@ public class VehiculoService {
 		}
 	}
 	
-	public BigDecimal sacarVehiculo (Long id) throws Exception {
+	public BigDecimal sacarVehiculo (Long id) {
 		
 		Vehiculo vehiculo = vehiculoRepository.findOne(id);
 		
@@ -111,7 +111,7 @@ public class VehiculoService {
 				
 			} 
 			
-			return BigDecimal.ZERO;
+			throw new BadRequestAlertException(ErrorMessages.VEHICULO_INCALCULABLE, ENTITY_NAME, "nocalculable");
 		}
 	}
 	
