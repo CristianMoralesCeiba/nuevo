@@ -59,19 +59,9 @@ public class VehiculoService {
 	}
 	
 	public boolean esDiaHabil(String placa, Instant fecha){
-
 		int dia = LocalDateTime.ofInstant(fecha, ZoneId.systemDefault()).get(ChronoField.DAY_OF_WEEK);
 		
-		switch (placa.substring(0, 1)){
-			case "A":
-				if (dia == 1 || dia == 7){  
-					return true;
-				} else {
-					return false;
-				}
-		}
-			
-		return true;
+		return placa.substring(0, 1).equals("A") && (dia == 1 || dia == 7);	
 	}
 	
 	public BigDecimal sacarVehiculo (Long id) throws Exception {
@@ -88,7 +78,7 @@ public class VehiculoService {
 			if (!tiempoEnParqueadero.isZero() && 
 				!tiempoEnParqueadero.isNegative()){
 				
-				BigDecimal valor = BigDecimal.ZERO;
+				BigDecimal valor;
 	
 				long dias = tiempoEnParqueadero.toDays();
 				long horas = tiempoEnParqueadero.toHours() - (dias * 24);
