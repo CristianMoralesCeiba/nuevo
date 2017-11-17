@@ -79,40 +79,55 @@ public class VehiculoService {
 		} else {
 			VehiculoDTO vehiculoDTO = vehiculoMapper.toDto(vehiculo);
 			
-			Duration tiempoEnParqueadero = Duration.between(vehiculoDTO.getFechaIngreso(), Instant.now());
+			long[] tiempo = calcularTiempoEnParqueadero (vehiculoDTO);
 			
-			if (!tiempoEnParqueadero.isZero() && 
-				!tiempoEnParqueadero.isNegative()){
+			if (tiempo != null && tiempo.length > 1){
 				
-				BigDecimal valor;
-	
-				long dias = tiempoEnParqueadero.toDays();
-				long horas = tiempoEnParqueadero.toHours() - (dias * 24);
-				
-				if (horas > MAX_COBRO_HORA){
-					dias += 1;
-					horas = 0;
-				}
-				
-				valor = (new BigDecimal(dias).multiply(vehiculoDTO.getTipo().getValorDia())).
-						add(new BigDecimal(horas).multiply(vehiculoDTO.getTipo().getValorHora()));
-				
-				if (dias == 0  && horas == 0){
-					valor = BigDecimal.ONE.multiply(vehiculoDTO.getTipo().getValorHora());	
-				}
-				
-				if (vehiculoDTO.getCilindraje() != null && vehiculoDTO.getCilindraje() >= ALTO_CILINDRAJE){
-					valor = valor.add(EXCEDENTE_CILINDRAJE);
-				}
-								
 				vehiculoRepository.delete(vehiculoDTO.getId());
 				
-				return valor;
-				
+				return calcularValorParqueadero(vehiculoDTO, tiempo[0], tiempo[1]);
 			} 
 			
 			throw new BadRequestAlertException(ErrorMessages.VEHICULO_INCALCULABLE, ENTITY_NAME, "nocalculable");
 		}
+	}
+	
+	public long[] calcularTiempoEnParqueadero (VehiculoDTO vehiculoDTO) {
+		
+		Duration tiempoEnParqueadero = Duration.between(vehiculoDTO.getFechaIngreso(), Instant.now());
+		
+		if (!tiempoEnParqueadero.isZero() && !tiempoEnParqueadero.isNegative()){
+
+			long dias = tiempoEnParqueadero.toDays();
+			long horas = tiempoEnParqueadero.toHours() - (dias * 24);
+			
+			if (horas > MAX_COBRO_HORA){
+				dias += 1;
+				horas = 0;
+			}
+			
+			return new long[]{dias, horas};
+		}
+		
+		return null;
+	}
+	
+	public BigDecimal calcularValorParqueadero (VehiculoDTO vehiculoDTO, long dias, long horas){
+		
+		BigDecimal valor;
+		
+		valor = (new BigDecimal(dias).multiply(vehiculoDTO.getTipo().getValorDia())).
+				add(new BigDecimal(horas).multiply(vehiculoDTO.getTipo().getValorHora()));
+		
+		if (dias == 0 && horas == 0){
+			valor = BigDecimal.ONE.multiply(vehiculoDTO.getTipo().getValorHora());	
+		}
+		
+		if (vehiculoDTO.getCilindraje() != null && vehiculoDTO.getCilindraje() >= ALTO_CILINDRAJE){
+			valor = valor.add(EXCEDENTE_CILINDRAJE);
+		}
+		
+		return valor;
 	}
 	
 }
