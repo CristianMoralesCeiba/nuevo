@@ -5,7 +5,12 @@ import org.zalando.problem.Status;
 
 public class InvalidPasswordException extends AbstractThrowableProblem {
 
-    public InvalidPasswordException() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -8741754627414445912L;
+
+	public InvalidPasswordException() {
         super(ErrorConstants.INVALID_PASSWORD_TYPE, "Incorrect password", Status.BAD_REQUEST);
     }
 }

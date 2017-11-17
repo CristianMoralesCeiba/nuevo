@@ -12,6 +12,11 @@ import co.ceiba.domain.enumeration.TipoVehiculo;
  */
 public class VehiculoDTO implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1500057442285367359L;
+
 	public VehiculoDTO() {
 		super();
 	}

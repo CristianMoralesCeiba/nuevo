@@ -62,7 +62,7 @@ public class VehiculoResource {
      */
     @PostMapping("/vehiculos")
     @Timed
-    public ResponseEntity<VehiculoDTO> createVehiculo(@Valid @RequestBody VehiculoDTO vehiculoDTO) throws URISyntaxException, Exception {
+    public ResponseEntity<VehiculoDTO> createVehiculo(@Valid @RequestBody VehiculoDTO vehiculoDTO) throws URISyntaxException {
         log.debug("REST request to save Vehiculo : {}", vehiculoDTO);
 
         VehiculoDTO result = vehiculoMapper.toDto(vehiculoService.crearVehiculo(vehiculoDTO));
@@ -108,7 +108,7 @@ public class VehiculoResource {
      */
     @DeleteMapping("/vehiculos/{id}")
     @Timed
-    public ResponseEntity<Void> deleteVehiculo(@PathVariable Long id) throws URISyntaxException, Exception{
+    public ResponseEntity<Void> deleteVehiculo(@PathVariable Long id) throws URISyntaxException{
         log.debug("REST request to delete Vehiculo : {}", id);
         
         BigDecimal valor = vehiculoService.sacarVehiculo(id);
