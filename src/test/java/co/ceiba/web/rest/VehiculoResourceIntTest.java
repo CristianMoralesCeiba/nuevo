@@ -245,18 +245,22 @@ public class VehiculoResourceIntTest {
         VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
         BigDecimal valorEsperado = BigDecimal.ZERO, horasPrueba = new BigDecimal("3");
         Duration horas = Duration.ofHours(horasPrueba.longValue());
-        VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.conFechaIngreso(Instant.now().minus(horas)).build(), resultDTO;
+        VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.conFechaIngreso(Instant.now().minus(horas)).build();
+        Vehiculo vehiculo;
         
-        //act
-        resultDTO = vehiculoMapper.toDto(vehiculoRepository.saveAndFlush(vehiculoMapper.toEntity(vehiculoDTO)));
-        valorEsperado = resultDTO.getTipo().getValorHora().multiply(horasPrueba);
+    	// Initialize the database
+        vehiculo = vehiculoRepository.saveAndFlush(vehiculoMapper.toEntity(vehiculoDTO));;
+        valorEsperado = vehiculoDTO.getTipo().getValorHora().multiply(horasPrueba);
         
       	//equals
-        MvcResult result = restVehiculoMockMvc.perform(delete("/api/vehiculos/{id}", vehiculoDTO.getId())
+        MvcResult result = restVehiculoMockMvc.perform(delete("/api/vehiculos/{id}", vehiculo.getId())
                 .accept(TestUtil.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk()).andReturn();
 
-       assertEquals(new BigDecimal(result.getResponse().getHeader("valor")), valorEsperado);
+        boolean valor = result.getResponse().getHeaders("X-nuevoApp-alert").contains(valorEsperado.toString());
+        boolean params = result.getResponse().getHeaders("X-nuevoApp-params").contains("valor");
+        
+        assertTrue(valor && params);
     }
     
     @Test
@@ -266,18 +270,22 @@ public class VehiculoResourceIntTest {
         VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
         BigDecimal valorEsperado = BigDecimal.ZERO, diasPrueba = new BigDecimal("3");
         Duration dias = Duration.ofDays(diasPrueba.longValue());
-        VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.conFechaIngreso(Instant.now().minus(dias)).build(), resultDTO;
+        VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.conFechaIngreso(Instant.now().minus(dias)).build();
+        Vehiculo vehiculo;
         
-        //act
-        resultDTO = vehiculoMapper.toDto(vehiculoRepository.saveAndFlush(vehiculoMapper.toEntity(vehiculoDTO)));
-        valorEsperado = resultDTO.getTipo().getValorDia().multiply(diasPrueba);
+    	// Initialize the database
+        vehiculo = vehiculoRepository.saveAndFlush(vehiculoMapper.toEntity(vehiculoDTO));;
+        valorEsperado = vehiculo.getTipo().getValorDia().multiply(diasPrueba);
         
       	//equals
-        MvcResult result = restVehiculoMockMvc.perform(delete("/api/vehiculos/{id}", vehiculoDTO.getId())
+        MvcResult result = restVehiculoMockMvc.perform(delete("/api/vehiculos/{id}", vehiculo.getId())
                 .accept(TestUtil.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk()).andReturn();
-
-       assertEquals(new BigDecimal(result.getResponse().getHeader("valor")), valorEsperado);
+        
+        boolean valor = result.getResponse().getHeaders("X-nuevoApp-alert").contains(valorEsperado.toString());
+        boolean params = result.getResponse().getHeaders("X-nuevoApp-params").contains("valor");
+        
+        assertTrue(valor && params);
     }
     
     @Test
@@ -288,19 +296,23 @@ public class VehiculoResourceIntTest {
         BigDecimal valorEsperado = BigDecimal.ZERO, diasPrueba = new BigDecimal("1"), horasPrueba = new BigDecimal("3");
         Duration dias = Duration.ofDays(diasPrueba.longValue());
         Duration horas = Duration.ofHours(horasPrueba.longValue());
-        VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.conFechaIngreso(Instant.now().minus(dias).minus(horas)).build(), resultDTO;
+        VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.conFechaIngreso(Instant.now().minus(dias).minus(horas)).build();
+        Vehiculo vehiculo;
         
-        //act
-        resultDTO = vehiculoMapper.toDto(vehiculoRepository.saveAndFlush(vehiculoMapper.toEntity(vehiculoDTO)));
-        valorEsperado = (resultDTO.getTipo().getValorDia().multiply(diasPrueba)).
-        				 add(resultDTO.getTipo().getValorHora().multiply(horasPrueba));
+    	// Initialize the database
+        vehiculo = vehiculoRepository.saveAndFlush(vehiculoMapper.toEntity(vehiculoDTO));
+        valorEsperado = (vehiculo.getTipo().getValorDia().multiply(diasPrueba)).
+        				 add(vehiculo.getTipo().getValorHora().multiply(horasPrueba));
         
       	//equals
-        MvcResult result = restVehiculoMockMvc.perform(delete("/api/vehiculos/{id}", vehiculoDTO.getId())
+        MvcResult result = restVehiculoMockMvc.perform(delete("/api/vehiculos/{id}", vehiculo.getId())
                 .accept(TestUtil.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk()).andReturn();
 
-       assertEquals(new BigDecimal(result.getResponse().getHeader("valor")), new BigDecimal("11000"));//valorEsperado);
+        boolean valor = result.getResponse().getHeaders("X-nuevoApp-alert").contains(valorEsperado.toString());
+        boolean params = result.getResponse().getHeaders("X-nuevoApp-params").contains("valor");
+        
+        assertTrue(valor && params);
     }
     
 
@@ -309,19 +321,20 @@ public class VehiculoResourceIntTest {
     public void deleteVehiculo() throws Exception {
     	 VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
          VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.build();
+         Vehiculo vehiculo;
          
     	// Initialize the database
-        vehiculoRepository.saveAndFlush(vehiculoMapper.toEntity(vehiculoDTO));
+        vehiculo = vehiculoRepository.saveAndFlush(vehiculoMapper.toEntity(vehiculoDTO));
         int databaseSizeBeforeDelete = vehiculoRepository.findAll().size();
 
         // Get the vehiculo
-        restVehiculoMockMvc.perform(delete("/api/vehiculos/{id}", vehiculoDTO.getId())
+        restVehiculoMockMvc.perform(delete("/api/vehiculos/{id}", vehiculo.getId())
             .accept(TestUtil.APPLICATION_JSON_UTF8))
             .andExpect(status().isOk());
 
         // Validate the database is empty
         List<Vehiculo> vehiculoList = vehiculoRepository.findAll();
-        assertThat(vehiculoList).hasSize(databaseSizeBeforeDelete - 1);
+        assertEquals(vehiculoList.size(), databaseSizeBeforeDelete - 1);
     }
 
 /*

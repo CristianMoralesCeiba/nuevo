@@ -95,7 +95,7 @@ public class VehiculoService {
 		} else {
 			VehiculoDTO vehiculoDTO = vehiculoMapper.toDto(vehiculo);
 			
-			Duration tiempoEnParqueadero = Duration.between(Instant.now(), vehiculoDTO.getFechaIngreso());
+			Duration tiempoEnParqueadero = Duration.between(vehiculoDTO.getFechaIngreso(), Instant.now());
 			
 			if (!tiempoEnParqueadero.isZero() && 
 				!tiempoEnParqueadero.isNegative()){
@@ -103,14 +103,12 @@ public class VehiculoService {
 				BigDecimal valor = BigDecimal.ZERO;
 	
 				long dias = tiempoEnParqueadero.toDays();
-				long horas = (dias * 24) - tiempoEnParqueadero.toHours();
+				long horas = tiempoEnParqueadero.toHours() - (dias * 24);
 				
 				if (horas > MAX_COBRO_HORA){
 					dias += 1;
 					horas = 0;
 				}
-				
-				log.debug("Sacar vehiculo : dias " + dias + " horas " + horas);
 				
 				valor = (new BigDecimal(dias).multiply(vehiculoDTO.getTipo().getValorDia())).
 						add(new BigDecimal(horas).multiply(vehiculoDTO.getTipo().getValorHora()));
@@ -122,16 +120,14 @@ public class VehiculoService {
 				if (vehiculoDTO.getCilindraje() >= ALTO_CILINDRAJE){
 					valor = valor.add(EXCEDENTE_CILINDRAJE);
 				}
-				
-				log.debug("Sacar vehiculo : El valor es: " + valor + " dias5 " + dias + " horas " + horas);
-				
+								
 				vehiculoRepository.delete(vehiculoDTO.getId());
 				
 				return valor;
 				
 			} 
 			
-			return new BigDecimal(tiempoEnParqueadero.toString());
+			return BigDecimal.ZERO;
 		}
 	}
 	

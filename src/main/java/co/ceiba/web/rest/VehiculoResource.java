@@ -106,19 +106,6 @@ public class VehiculoResource {
      */
     @DeleteMapping("/vehiculos/{id}")
     @Timed
-    public ResponseEntity<Void> deleteVehiculo(@PathVariable Long id){
-        log.debug("REST request to delete Vehiculo : {}", id);
-        
-        //BigDecimal valor = vehiculoService.sacarVehiculo(id);
-        
-        return ResponseEntity.ok().
-        		headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).
-        		headers(HeaderUtil.createEntityValueDeletionAlert(BigDecimal.ZERO)).
-        		build();
-    }/*
-    
-    @DeleteMapping("/vehiculos/{id}")
-    @Timed
     public ResponseEntity<Void> deleteVehiculo(@PathVariable Long id) throws URISyntaxException{
         log.debug("REST request to delete Vehiculo : {}", id);
         
@@ -126,7 +113,7 @@ public class VehiculoResource {
         
         return ResponseEntity.ok().
         		headers(HeaderUtil.createEntityDeletionAlert(ENTITY_NAME, id.toString())).
-        		//headers(HeaderUtil.createEntityValueDeletionAlert(valor)).
+        		headers(HeaderUtil.createEntityValueDeletionAlert(valor)).
         		build();
     }
-*/}
+}
