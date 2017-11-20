@@ -3,6 +3,7 @@ package co.ceiba.service;
 import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.Instant;
 
 import org.junit.Test;
@@ -47,10 +48,10 @@ public class VehiculoServiceUnitTest {
 	@Test
 	public void recargoAltoCilindraje(){
 		VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
-		VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.conCilindraje(vehiculoService.ALTO_CILINDRAJE)
+		VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.conCilindraje(VehiculoService.ALTO_CILINDRAJE)
 								  .build();
 		BigDecimal valorEsperado = BigDecimal.ONE.multiply(vehiculoDTO.getTipo().getValorHora())
-								   .add(vehiculoService.EXCEDENTE_CILINDRAJE);
+								   .add(VehiculoService.EXCEDENTE_CILINDRAJE);
 		
 		assertEquals(valorEsperado, vehiculoService.calcularValorParqueadero(vehiculoDTO, 0, 1));
 	}
@@ -63,5 +64,29 @@ public class VehiculoServiceUnitTest {
 		BigDecimal valorEsperado = BigDecimal.ONE.multiply(vehiculoDTO.getTipo().getValorHora());
 		
 		assertEquals(valorEsperado, vehiculoService.calcularValorParqueadero(vehiculoDTO, 0, 1));
+	}
+	
+	@Test
+	public void calculoValorHoras(){
+		VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
+		VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.build();
+		Instant fechaSalida = vehiculoDTO.getFechaIngreso().plus(Duration.ofHours(VehiculoService.MAX_COBRO_HORA));
+		long tiempo[];
+		
+		tiempo = vehiculoService.calcularTiempoEnParqueadero(vehiculoDTO, fechaSalida);
+		
+		assertEquals(VehiculoService.MAX_COBRO_HORA, tiempo[1]);
+	}
+	
+	@Test
+	public void calculoValorDia(){
+		VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
+		VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.build();
+		Instant fechaSalida = vehiculoDTO.getFechaIngreso().plus(Duration.ofHours(VehiculoService.MAX_COBRO_HORA + 1));
+		long tiempo[];
+		
+		tiempo = vehiculoService.calcularTiempoEnParqueadero(vehiculoDTO, fechaSalida);
+		
+		assertEquals(1, tiempo[0]);
 	}
 }

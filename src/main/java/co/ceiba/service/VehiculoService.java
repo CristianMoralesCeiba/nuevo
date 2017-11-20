@@ -20,10 +20,10 @@ import co.ceiba.web.rest.util.ErrorMessages;
 @Service
 public class VehiculoService {
 
-	private final String ENTITY_NAME = "vehiculo";
-	private final int MAX_COBRO_HORA = 9;
-	public final BigDecimal EXCEDENTE_CILINDRAJE = new BigDecimal("2000");
-	public final int ALTO_CILINDRAJE = 500;
+	private static final String ENTITY_NAME = "vehiculo";
+	public static final int MAX_COBRO_HORA = 9;
+	public static final BigDecimal EXCEDENTE_CILINDRAJE = new BigDecimal("2000");
+	public static final int ALTO_CILINDRAJE = 500;
 
     private final VehiculoMapper vehiculoMapper;
 	
