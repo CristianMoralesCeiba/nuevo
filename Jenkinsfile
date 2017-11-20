@@ -24,7 +24,7 @@ node {
 
 	stage('build') {
         try {
-            sh "./mvnw install -DskipTests"
+            sh "./mvnw install -DskipTests spring-boot:run"
         } catch(err) {
             throw err
         } 
