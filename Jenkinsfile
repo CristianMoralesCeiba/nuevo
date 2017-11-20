@@ -23,7 +23,7 @@ node {
     }
 	
 	stage('stress tests') {
-        sh "jmeter.bat -n -t  ${workspace}\prueba.jmx -l testJmeter.jtl"
+        sh "jmeter.bat -n -t  ${workspace}\\prueba.jmx -l testJmeter.jtl"
     }
 
     stage('backend tests') {
