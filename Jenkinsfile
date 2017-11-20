@@ -21,6 +21,10 @@ node {
     stage('yarn install') {
         sh "./mvnw com.github.eirslett:frontend-maven-plugin:yarn"
     }
+	
+	stage('stress tests') {
+        sh "jmeter.bat -n -t /prueba.jmx -l testJmeter.jtl"
+    }
 
     stage('backend tests') {
         try {
@@ -40,10 +44,6 @@ node {
         } finally {
             junit '**/target/test-results/karma/TESTS-*.xml'
         }
-    }
-
-	stage('stress tests') {
-        sh "jmeter -n -t /prueba.jmx -l testJmeter.jtl"
     }
 
     stage('packaging') {
