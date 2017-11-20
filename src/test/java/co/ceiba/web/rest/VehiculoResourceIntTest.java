@@ -4,9 +4,9 @@ import static co.ceiba.web.rest.TestUtil.createFormattingConversionService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.Matchers.hasItem;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
@@ -21,6 +21,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -78,34 +79,7 @@ public class VehiculoResourceIntTest {
             .setConversionService(createFormattingConversionService())
             .setMessageConverters(jacksonMessageConverter).build();
     }
-
-
-    @Test
-    @Transactional
-    public void createVehiculo() throws Exception {
-    	
-    	//arrage
-
-        VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
-    	
-        int databaseSizeBeforeCreate = vehiculoRepository.findAll().size();
-        // Create the Vehiculo
-        VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.build();
-        restVehiculoMockMvc.perform(post("/api/vehiculos")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(vehiculoDTO)))
-            .andExpect(status().isCreated());
-
-        // Validate the Vehiculo in the database
-        List<Vehiculo> vehiculoList = vehiculoRepository.findAll();
-        assertThat(vehiculoList).hasSize(databaseSizeBeforeCreate + 1);
-        Vehiculo testVehiculo = vehiculoList.get(vehiculoList.size() - 1);
-        assertThat(testVehiculo.getPlaca()).isEqualTo(vehiculoTestDataBuilder.PLACA);
-        assertThat(testVehiculo.getTipo()).isEqualTo(vehiculoTestDataBuilder.TIPO);
-        assertThat(testVehiculo.getCilindraje()).isEqualTo(vehiculoTestDataBuilder.CILINDRAJE);
-        assertThat(testVehiculo.getFechaIngreso()).isEqualTo(vehiculoTestDataBuilder.FECHAINGRESO);
-    }
-
+ 
     @Test
     @Transactional
     public void createVehiculoWithExistingId() throws Exception {
@@ -325,6 +299,70 @@ public class VehiculoResourceIntTest {
         // Validate the database is empty
         List<Vehiculo> vehiculoList = vehiculoRepository.findAll();
         assertEquals(vehiculoList.size(), databaseSizeBeforeDelete - 1);
+    }
+    
+    @Test
+    @Transactional
+    public void getAllVehiculos() throws Exception {
+    	//arrage
+        VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
+        VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.build();
+    	Vehiculo vehiculo;
+        
+        // Initialize the database
+    	vehiculo = vehiculoRepository.saveAndFlush(vehiculoMapper.toEntity(vehiculoDTO));
+
+        // Get all the vehiculoList
+        restVehiculoMockMvc.perform(get("/api/vehiculos?sort=id,desc"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$.[*].id").value(hasItem(vehiculo.getId().intValue())))
+            .andExpect(jsonPath("$.[*].placa").value(hasItem(vehiculo.getPlaca())));
+    }
+
+    @Test
+    @Transactional
+    public void getVehiculo() throws Exception {
+    	//arrage
+        VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
+        VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.build();
+    	Vehiculo vehiculo;
+        
+        // Initialize the database
+    	vehiculo = vehiculoRepository.saveAndFlush(vehiculoMapper.toEntity(vehiculoDTO));
+
+        // Get all the vehiculoList
+    	restVehiculoMockMvc.perform(get("/api/vehiculos/{id}", vehiculo.getId()))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+            .andExpect(jsonPath("$.id").value(vehiculo.getId().intValue()))
+            .andExpect(jsonPath("$.placa").value(vehiculo.getPlaca()));
+    }
+
+    @Test
+    @Transactional
+    public void createVehiculo() throws Exception {
+    	
+    	//arrage
+
+        VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
+    	
+        int databaseSizeBeforeCreate = vehiculoRepository.findAll().size();
+        // Create the Vehiculo
+        VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.build();
+        restVehiculoMockMvc.perform(post("/api/vehiculos")
+            .contentType(TestUtil.APPLICATION_JSON_UTF8)
+            .content(TestUtil.convertObjectToJsonBytes(vehiculoDTO)))
+            .andExpect(status().isCreated());
+
+        // Validate the Vehiculo in the database
+        List<Vehiculo> vehiculoList = vehiculoRepository.findAll();
+        assertThat(vehiculoList).hasSize(databaseSizeBeforeCreate + 1);
+        Vehiculo testVehiculo = vehiculoList.get(vehiculoList.size() - 1);
+        assertThat(testVehiculo.getPlaca()).isEqualTo(vehiculoTestDataBuilder.PLACA);
+        assertThat(testVehiculo.getTipo()).isEqualTo(vehiculoTestDataBuilder.TIPO);
+        assertThat(testVehiculo.getCilindraje()).isEqualTo(vehiculoTestDataBuilder.CILINDRAJE);
+        assertThat(testVehiculo.getFechaIngreso()).isEqualTo(vehiculoTestDataBuilder.FECHAINGRESO);
     }
 
 }
