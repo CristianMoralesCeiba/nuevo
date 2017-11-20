@@ -23,6 +23,7 @@ node {
     }
 	
 	stage('stress tests') {
+		sh "./mvnw spring-boot:run"
         sh "jmeter.bat -n -t  '${workspace}\\prueba.jmx' -l testJmeter.jtl"
     }
 
