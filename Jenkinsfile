@@ -22,14 +22,6 @@ node {
         sh "./mvnw com.github.eirslett:frontend-maven-plugin:yarn"
     }
 
-	stage('build') {
-        try {
-            sh "./mvnw install -DskipTests spring-boot:run"
-        } catch(err) {
-            throw err
-        } 
-    }
-	
     stage('backend tests') {
         try {
             sh "./mvnw test"
@@ -48,6 +40,10 @@ node {
         } finally {
             junit '**/target/test-results/karma/TESTS-*.xml'
         }
+    }
+
+	stage('stress tests') {
+        sh "jmeter -n -t /prueba.jmx -l testJmeter.jtl"
     }
 
     stage('packaging') {
