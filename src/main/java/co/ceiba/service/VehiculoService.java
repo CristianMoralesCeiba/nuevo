@@ -20,10 +20,10 @@ import co.ceiba.web.rest.util.ErrorMessages;
 @Service
 public class VehiculoService {
 
-	private static final String ENTITY_NAME = "vehiculo";
-	private static final int MAX_COBRO_HORA = 9;
-	private static final BigDecimal EXCEDENTE_CILINDRAJE = new BigDecimal("2000");
-	private static final int ALTO_CILINDRAJE = 500;
+	private final String ENTITY_NAME = "vehiculo";
+	private final int MAX_COBRO_HORA = 9;
+	public final BigDecimal EXCEDENTE_CILINDRAJE = new BigDecimal("2000");
+	public final int ALTO_CILINDRAJE = 500;
 
     private final VehiculoMapper vehiculoMapper;
 	
@@ -73,28 +73,24 @@ public class VehiculoService {
 	public BigDecimal sacarVehiculo (Long id) {
 		
 		Vehiculo vehiculo = vehiculoRepository.findOne(id);
+		VehiculoDTO vehiculoDTO = vehiculoMapper.toDto(vehiculo);
 		
-		if (vehiculo == null){
-			throw new BadRequestAlertException(ErrorMessages.VEHICULO_NO_EXISTE, ENTITY_NAME, "vehiculonoexiste");
-		} else {
-			VehiculoDTO vehiculoDTO = vehiculoMapper.toDto(vehiculo);
+		long[] tiempo = calcularTiempoEnParqueadero (vehiculoDTO, Instant.now());
+		
+		if (tiempo.length > 1){
 			
-			long[] tiempo = calcularTiempoEnParqueadero (vehiculoDTO);
+			vehiculoRepository.delete(vehiculoDTO.getId());
 			
-			if (tiempo.length > 1){
-				
-				vehiculoRepository.delete(vehiculoDTO.getId());
-				
-				return calcularValorParqueadero(vehiculoDTO, tiempo[0], tiempo[1]);
-			} 
-			
-			throw new BadRequestAlertException(ErrorMessages.VEHICULO_INCALCULABLE, ENTITY_NAME, "nocalculable");
-		}
+			return calcularValorParqueadero(vehiculoDTO, tiempo[0], tiempo[1]);
+		} 
+		
+		throw new BadRequestAlertException(ErrorMessages.VEHICULO_INCALCULABLE, ENTITY_NAME, "nocalculable");
+		
 	}
 	
-	public long[] calcularTiempoEnParqueadero (VehiculoDTO vehiculoDTO) {
+	public long[] calcularTiempoEnParqueadero (VehiculoDTO vehiculoDTO, Instant fechaSalida) {
 		
-		Duration tiempoEnParqueadero = Duration.between(vehiculoDTO.getFechaIngreso(), Instant.now());
+		Duration tiempoEnParqueadero = Duration.between(vehiculoDTO.getFechaIngreso(), fechaSalida);
 		
 		if (!tiempoEnParqueadero.isZero() && !tiempoEnParqueadero.isNegative()){
 

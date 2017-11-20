@@ -112,9 +112,8 @@ public class VehiculoResourceIntTest {
     	//arrage
         VehiculoTestDataBuilder vehiculoTestDataBuilder = new VehiculoTestDataBuilder();
                 
-        // Create the Vehiculo
         VehiculoDTO vehiculoDTO = vehiculoTestDataBuilder.conID(1L).build();
-        // An entity with an existing ID cannot be created, so this API call must fail
+
         MvcResult result = restVehiculoMockMvc.perform(post("/api/vehiculos")
             .contentType(TestUtil.APPLICATION_JSON_UTF8)
             .content(TestUtil.convertObjectToJsonBytes(vehiculoDTO)))
@@ -305,7 +304,7 @@ public class VehiculoResourceIntTest {
         
         assertTrue(valor && params);
     }
-    
+       
 
     @Test
     @Transactional
@@ -328,160 +327,4 @@ public class VehiculoResourceIntTest {
         assertEquals(vehiculoList.size(), databaseSizeBeforeDelete - 1);
     }
 
-/*
-    @Test
-    @Transactional
-    public void checkPlacaIsRequired() throws Exception {
-        int databaseSizeBeforeTest = vehiculoRepository.findAll().size();
-        // set the field null
-        vehiculo.setPlaca(null);
-
-        // Create the Vehiculo, which fails.
-        VehiculoDTO vehiculoDTO = vehiculoMapper.toDto(vehiculo);
-
-        restVehiculoMockMvc.perform(post("/api/vehiculos")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(vehiculoDTO)))
-            .andExpect(status().isBadRequest());
-
-        List<Vehiculo> vehiculoList = vehiculoRepository.findAll();
-        assertThat(vehiculoList).hasSize(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
-    public void checkTipoIsRequired() throws Exception {
-        int databaseSizeBeforeTest = vehiculoRepository.findAll().size();
-        // set the field null
-        vehiculo.setTipo(null);
-
-        // Create the Vehiculo, which fails.
-        VehiculoDTO vehiculoDTO = vehiculoMapper.toDto(vehiculo);
-
-        restVehiculoMockMvc.perform(post("/api/vehiculos")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(vehiculoDTO)))
-            .andExpect(status().isBadRequest());
-
-        List<Vehiculo> vehiculoList = vehiculoRepository.findAll();
-        assertThat(vehiculoList).hasSize(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
-    public void checkFechaIngresoIsRequired() throws Exception {
-        int databaseSizeBeforeTest = vehiculoRepository.findAll().size();
-        // set the field null
-        vehiculo.setFechaIngreso(null);
-
-        // Create the Vehiculo, which fails.
-        VehiculoDTO vehiculoDTO = vehiculoMapper.toDto(vehiculo);
-
-        restVehiculoMockMvc.perform(post("/api/vehiculos")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(vehiculoDTO)))
-            .andExpect(status().isBadRequest());
-
-        List<Vehiculo> vehiculoList = vehiculoRepository.findAll();
-        assertThat(vehiculoList).hasSize(databaseSizeBeforeTest);
-    }
-
-    @Test
-    @Transactional
-    public void getAllVehiculos() throws Exception {
-        // Initialize the database
-        vehiculoRepository.saveAndFlush(vehiculo);
-
-        // Get all the vehiculoList
-        restVehiculoMockMvc.perform(get("/api/vehiculos?sort=id,desc"))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(vehiculo.getId().intValue())))
-            .andExpect(jsonPath("$.[*].placa").value(hasItem(DEFAULT_PLACA.toString())))
-            .andExpect(jsonPath("$.[*].tipo").value(hasItem(DEFAULT_TIPO.toString())))
-            .andExpect(jsonPath("$.[*].cilindraje").value(hasItem(DEFAULT_CILINDRAJE)))
-            .andExpect(jsonPath("$.[*].fechaIngreso").value(hasItem(DEFAULT_FECHA_INGRESO.toString())));
-    }
-
-    @Test
-    @Transactional
-    public void getVehiculo() throws Exception {
-        // Initialize the database
-        vehiculoRepository.saveAndFlush(vehiculo);
-
-        // Get the vehiculo
-        restVehiculoMockMvc.perform(get("/api/vehiculos/{id}", vehiculo.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-            .andExpect(jsonPath("$.id").value(vehiculo.getId().intValue()))
-            .andExpect(jsonPath("$.placa").value(DEFAULT_PLACA.toString()))
-            .andExpect(jsonPath("$.tipo").value(DEFAULT_TIPO.toString()))
-            .andExpect(jsonPath("$.cilindraje").value(DEFAULT_CILINDRAJE))
-            .andExpect(jsonPath("$.fechaIngreso").value(DEFAULT_FECHA_INGRESO.toString()));
-    }
-
-    @Test
-    @Transactional
-    public void getNonExistingVehiculo() throws Exception {
-        // Get the vehiculo
-        restVehiculoMockMvc.perform(get("/api/vehiculos/{id}", Long.MAX_VALUE))
-            .andExpect(status().isNotFound());
-    }
-
-    @Test
-    @Transactional
-    public void updateNonExistingVehiculo() throws Exception {
-        int databaseSizeBeforeUpdate = vehiculoRepository.findAll().size();
-
-        // Create the Vehiculo
-        VehiculoDTO vehiculoDTO = vehiculoMapper.toDto(vehiculo);
-
-        // If the entity doesn't have an ID, it will be created instead of just being updated
-        restVehiculoMockMvc.perform(put("/api/vehiculos")
-            .contentType(TestUtil.APPLICATION_JSON_UTF8)
-            .content(TestUtil.convertObjectToJsonBytes(vehiculoDTO)))
-            .andExpect(status().isCreated());
-
-        // Validate the Vehiculo in the database
-        List<Vehiculo> vehiculoList = vehiculoRepository.findAll();
-        assertThat(vehiculoList).hasSize(databaseSizeBeforeUpdate + 1);
-    }
-
-    @Test
-    @Transactional
-    public void equalsVerifier() throws Exception {
-        TestUtil.equalsVerifier(Vehiculo.class);
-        Vehiculo vehiculo1 = new Vehiculo();
-        vehiculo1.setId(1L);
-        Vehiculo vehiculo2 = new Vehiculo();
-        vehiculo2.setId(vehiculo1.getId());
-        assertThat(vehiculo1).isEqualTo(vehiculo2);
-        vehiculo2.setId(2L);
-        assertThat(vehiculo1).isNotEqualTo(vehiculo2);
-        vehiculo1.setId(null);
-        assertThat(vehiculo1).isNotEqualTo(vehiculo2);
-    }
-
-    @Test
-    @Transactional
-    public void dtoEqualsVerifier() throws Exception {
-        TestUtil.equalsVerifier(VehiculoDTO.class);
-        VehiculoDTO vehiculoDTO1 = new VehiculoDTO();
-        vehiculoDTO1.setId(1L);
-        VehiculoDTO vehiculoDTO2 = new VehiculoDTO();
-        assertThat(vehiculoDTO1).isNotEqualTo(vehiculoDTO2);
-        vehiculoDTO2.setId(vehiculoDTO1.getId());
-        assertThat(vehiculoDTO1).isEqualTo(vehiculoDTO2);
-        vehiculoDTO2.setId(2L);
-        assertThat(vehiculoDTO1).isNotEqualTo(vehiculoDTO2);
-        vehiculoDTO1.setId(null);
-        assertThat(vehiculoDTO1).isNotEqualTo(vehiculoDTO2);
-    }
-
-    @Test
-    @Transactional
-    public void testEntityFromId() {
-        assertThat(vehiculoMapper.fromId(42L).getId()).isEqualTo(42);
-        assertThat(vehiculoMapper.fromId(null)).isNull();
-    }*/
 }
