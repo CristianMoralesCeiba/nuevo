@@ -25,6 +25,7 @@ node {
 	stage('stress tests') {
 		sh "./mvnw spring-boot:start -DskipTests"
         sh "jmeter.bat -n -t  '${workspace}\\prueba.jmx' -l testJmeter.jtl"
+		sh "./mvnw spring-boot:stop -DskipTests"
     }
 
     stage('backend tests') {
