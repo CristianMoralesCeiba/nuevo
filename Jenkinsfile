@@ -4,6 +4,10 @@ node {
     stage('checkout') {
         checkout scm
     }
+	
+	stage('docker test') {
+		sh "docker stop '(docker ps -aq)'"
+    }
 
     stage('check java') {
         sh "java -version"
