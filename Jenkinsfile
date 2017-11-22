@@ -5,10 +5,6 @@ node {
         checkout scm
     }
 	
-	stage('docker test') {
-		sh "docker stop &(docker ps -aq)"
-    }
-
     stage('check java') {
         sh "java -version"
     }
@@ -29,9 +25,9 @@ node {
 	stage('docker') {
 		sh "./mvnw package dockerfile:build -DskipTests"
         sh "docker-compose -f '${workspace}\\src\\main\\docker\\app.yml' up -d"
-		sleep (120)
+		sleep (100)
 		sh "jmeter.bat -n -t  '${workspace}\\prueba.jmx' -l testJmeter.jtl"
-		sh "docker stop (docker ps -aq)"
+		sh "docker stop &(docker ps -aq)"
     }
 
     stage('backend tests') {
