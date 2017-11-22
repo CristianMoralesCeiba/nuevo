@@ -5,6 +5,10 @@ node {
         checkout scm
     }
 	
+	stage ('ReportPerform') {
+		perfReport 'testJmeter.jtl'
+	}
+	
     stage('check java') {
         sh "java -version"
     }
