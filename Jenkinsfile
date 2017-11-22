@@ -50,8 +50,6 @@ node {
 
 	stage('stress tests') {
         sh "jmeter.bat -Jjmeter.save.saveservice.output_format=xml -n -t  '${workspace}\\prueba.jmx' -l '${workspace}\\target\\testJmeter.jtl'"
-		archiveArtifacts artifacts: '**/target/*.jtl', fingerprint: true
-		archiveArtifacts artifacts: '**/target/*.xml', fingerprint: true
 	}
 	
 	stage('docker stop') {
