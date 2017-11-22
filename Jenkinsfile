@@ -6,7 +6,7 @@ node {
     }
 	
 	stage('docker test') {
-		sh "docker stop '(docker ps -aq)'"
+		sh "docker stop \(docker ps -aq\)"
     }
 
     stage('check java') {
