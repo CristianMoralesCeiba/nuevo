@@ -21,11 +21,11 @@ node {
     stage('yarn install') {
         sh "./mvnw com.github.eirslett:frontend-maven-plugin:yarn"
     }
-	
-	stage('stress tests') {
-		sh "./mvnw spring-boot:start -DskipTests"
-        sh "jmeter.bat -n -t  '${workspace}\\prueba.jmx' -l testJmeter.jtl"
-		sh "./mvnw spring-boot:stop -DskipTests"
+
+	stage('docker') {
+		sh "./mvnw package dockerfile:build -DskipTests"
+        sh "docker-compose -f '${workspace}\\src\\main\\docker\\app.yml' up"
+		sh "docker stop (docker ps -aq)"
     }
 
     stage('backend tests') {

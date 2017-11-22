@@ -3,7 +3,7 @@ services:
   jenkins:
     image: jenkins:latest
     ports:
-      - 49001:8080
+      - 49001:8282
       - 50000:50000
     # uncomment for docker in docker
     #privileged: true
