@@ -21,15 +21,7 @@ node {
     stage('yarn install') {
         sh "./mvnw com.github.eirslett:frontend-maven-plugin:yarn"
     }
-
-	stage('docker') {
-		sh "./mvnw package dockerfile:build -DskipTests"
-        sh "docker-compose -f '${workspace}\\src\\main\\docker\\app.yml' up -d"
-		sleep (100)
-		sh "jmeter.bat -n -t  '${workspace}\\prueba.jmx' -l testJmeter.jtl"
-		sh "docker stop &(docker ps -aq)"
-    }
-
+	
     stage('backend tests') {
         try {
             sh "./mvnw test"
@@ -49,7 +41,24 @@ node {
             junit '**/target/test-results/karma/TESTS-*.xml'
         }
     }
+	
+	stage('docker deployment') {
+		sh "./mvnw package dockerfile:build -DskipTests"
+        sh "docker-compose -f '${workspace}\\src\\main\\docker\\app.yml' up -d"
+		sleep (100)
+    }
 
+	stage('stress tests') {
+        sh "jmeter.bat -Jjmeter.save.saveservice.output_format=xml -n -t  '${workspace}\\prueba.jmx' -l '${workspace}\\target\\testJmeter.jtl'"
+		archiveArtifacts artifacts: '**/target/*.jtl', fingerprint: true
+		archiveArtifacts artifacts: '**/target/*.xml', fingerprint: true
+	}
+	
+	stage('docker stop') {
+        sh "docker stop &(docker ps -aq)"
+    }
+	
+	
     stage('packaging') {
         sh "./mvnw package -Pprod -DskipTests"
         archiveArtifacts artifacts: '**/target/*.war', fingerprint: true
